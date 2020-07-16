@@ -86,3 +86,8 @@ void Channel::SetChannelError(bool ready)
 {
 	channel_error_ = ready;
 }
+
+void Channel::HandleEvent()
+{
+
+}

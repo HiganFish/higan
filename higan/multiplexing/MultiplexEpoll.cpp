@@ -11,11 +11,11 @@
 
 using namespace higan;
 
-const int MultiplexEpoll::epoll_max_event_;
+const int MultiplexEpoll::EPOLL_MAX_EVNETS;
 
 MultiplexEpoll::MultiplexEpoll():
 epollfd_(epoll_create(5)),
-epoll_events_(epoll_max_event_)
+epoll_events_(EPOLL_MAX_EVNETS)
 {
 	
 }
@@ -42,29 +42,28 @@ bool MultiplexEpoll::Modify(Channel* channel)
 	return UpdateChannelEvent(channel, EPOLL_CTL_MOD);
 }
 
-MultiplexBase::LoopResult
-MultiplexEpoll::LoopOnce(int timeout, MultiplexBase::ChannelList* active_channel_list)
+int MultiplexEpoll::LoopOnce(int timeout, MultiplexBase::ChannelList* active_channel_list)
 {
 
-	int epoll_ret = epoll_wait(epollfd_, &epoll_events_[0], epoll_max_event_, timeout);
+	int epoll_ret = epoll_wait(epollfd_, &epoll_events_[0], EPOLL_MAX_EVNETS, timeout);
 
 	if (epoll_ret < 0)
 	{
 		if (errno != EINTR)
 		{
 			LOG_IF(true, "epoll_wait error");
-			return LoopResult::LOOP_ERROR;
+			return -1;
 		}
 	}
 
 	if (epoll_ret == 0)
 	{
-		return LoopResult::LOOP_TIMEUP;
+		return 0;
 	}
 
 	FillActiveChannelList(epoll_ret, active_channel_list);
 
-	return LoopResult::LOOP_ACTIVE;
+	return epoll_ret;
 }
 
 void MultiplexEpoll::FillActiveChannelList(int active_event_num, MultiplexBase::ChannelList* active_channel_list)
@@ -88,7 +87,7 @@ void MultiplexEpoll::FillActiveChannelList(int active_event_num, MultiplexBase::
 		channel->SetChannelWritable(epoll_events_[i].events & EPOLLOUT);
 		channel->SetChannelError(epoll_events_[i].events & (EPOLLERR | EPOLLHUP));
 
-		active_channel_list->push(channel);
+		(*active_channel_list)[i] = channel;
 	}
 }
 

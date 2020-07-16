@@ -14,6 +14,9 @@ namespace higan
 class MultiplexEpoll : public MultiplexBase
 {
 public:
+
+	const static int EPOLL_MAX_EVNETS = 100;
+
 	MultiplexEpoll();
 	~MultiplexEpoll();
 
@@ -43,14 +46,14 @@ public:
 	 * 执行一次多路复用
 	 * @param active_channel_list 填充并返回就绪的事件
 	 * @param timeout 超时时间, 可用于设定定时器事件 单位毫秒
-	 * @return
+	 * @return 就绪事件数量 -1出错 0超时
 	 */
-	MultiplexBase::LoopResult LoopOnce(int timeout, MultiplexBase::ChannelList* active_channel_list) override;
+	int LoopOnce(int timeout, MultiplexBase::ChannelList* active_channel_list) override;
 private:
 
 	int epollfd_;
 
-	const static int epoll_max_event_ = 100;
+
 
 	std::vector<epoll_event> epoll_events_;
 

@@ -28,7 +28,7 @@ bool MultiplexBase::Delete(Channel* channel)
 	return false;
 }
 
-MultiplexBase::LoopResult MultiplexBase::LoopOnce(int timeout, MultiplexBase::ChannelList* active_channel_list)
+int MultiplexBase::LoopOnce(int timeout, MultiplexBase::ChannelList* active_channel_list)
 {
-	return LoopResult::LOOP_ERROR;
+	return 0;
 }

@@ -3,6 +3,7 @@ SET(SRCS_FILES
     multiplexing/MultiplexEpoll.cpp
     Channel.cpp
     utils/Logger.cpp
+    EventLoop.cpp
 )
 
 SET(HEADERS_FILES
@@ -10,8 +11,9 @@ SET(HEADERS_FILES
     multiplexing/MultiplexEpoll.h
     Channel.h
     utils/Logger.h
+    EventLoop.h
 )
 
-add_library(mongo_net ${SRCS_FILES} ${HEADERS_FILES})
+add_library(higan_net ${SRCS_FILES} ${HEADERS_FILES})
 
-include_directories(../)
+include_directories(${CMAKE_SOURCE_DIR})

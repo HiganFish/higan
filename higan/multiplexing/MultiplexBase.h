@@ -5,7 +5,7 @@
 #ifndef _MULTIPLEXBASE_H_
 #define _MULTIPLEXBASE_H_
 
-#include <queue>
+#include <vector>
 #include <ctime>
 
 namespace higan
@@ -16,14 +16,8 @@ class MultiplexBase
 {
 public:
 
-	typedef std::queue<Channel*> ChannelList;
+	typedef std::vector<Channel*> ChannelList;
 
-	enum class LoopResult
-	{
-		LOOP_ERROR = -1, /* 多路复用出错*/
-		LOOP_TIMEUP = 0, /* 多路复用超时*/
-		LOOP_ACTIVE = 1 /* 多路复用返回就绪事件*/
-	};
 
 	MultiplexBase();
 	~MultiplexBase();
@@ -34,7 +28,7 @@ public:
 
 	virtual bool Delete(Channel* channel);
 
-	virtual MultiplexBase::LoopResult LoopOnce(int timeout, MultiplexBase::ChannelList* active_channel_list);
+	virtual int LoopOnce(int timeout, MultiplexBase::ChannelList* active_channel_list);
 
 private:
 

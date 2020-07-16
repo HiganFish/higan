@@ -54,6 +54,11 @@ public:
 
 	void SetChannelError(bool ready);
 
+	/**
+	 * EventLoop调用, 用来调用对应的事件处理函数
+	 */
+	void HandleEvent();
+
 private:
 
 	int fd_;
