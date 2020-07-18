@@ -22,11 +22,7 @@ public:
 	MultiplexBase();
 	~MultiplexBase();
 
-	virtual bool Add(Channel* channel);
-
-	virtual bool Modify(Channel* channel);
-
-	virtual bool Delete(Channel* channel);
+	virtual void UpdateChannel(Channel* channel);
 
 	virtual int LoopOnce(int timeout, MultiplexBase::ChannelList* active_channel_list);
 

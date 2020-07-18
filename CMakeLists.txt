@@ -3,5 +3,9 @@ project(higan)
 
 set(CMAKE_CXX_STANDARD 11)
 
+SET(CMAKE_CXX_FLAGS
+    -g
+)
+
 add_subdirectory(higan)
 add_subdirectory(test)

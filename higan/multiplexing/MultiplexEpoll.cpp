@@ -11,11 +11,12 @@
 
 using namespace higan;
 
-const int MultiplexEpoll::EPOLL_MAX_EVNETS;
+const int MultiplexEpoll::EPOLL_MAX_EVNETS = 100;
+const int MultiplexEpoll::EPOLL_DEFAULT_EVENT = EPOLLET;
 
 MultiplexEpoll::MultiplexEpoll():
-epollfd_(epoll_create(5)),
-epoll_events_(EPOLL_MAX_EVNETS)
+		epollfd_(epoll_create(5)),
+		epoll_events_(EPOLL_MAX_EVNETS)
 {
 	
 }
@@ -25,27 +26,11 @@ MultiplexEpoll::~MultiplexEpoll()
 	close(epollfd_);
 }
 
-bool MultiplexEpoll::Add(Channel* channel)
-{
-
-	return UpdateChannelEvent(channel, EPOLL_CTL_ADD);
-}
-
-bool MultiplexEpoll::Delete(Channel* channel)
-{
-	return UpdateChannelEvent(channel, EPOLL_CTL_DEL);
-}
-
-bool MultiplexEpoll::Modify(Channel* channel)
-{
-
-	return UpdateChannelEvent(channel, EPOLL_CTL_MOD);
-}
-
 int MultiplexEpoll::LoopOnce(int timeout, MultiplexBase::ChannelList* active_channel_list)
 {
 
 	int epoll_ret = epoll_wait(epollfd_, &epoll_events_[0], EPOLL_MAX_EVNETS, timeout);
+
 
 	if (epoll_ret < 0)
 	{
@@ -54,14 +39,16 @@ int MultiplexEpoll::LoopOnce(int timeout, MultiplexBase::ChannelList* active_cha
 			LOG_IF(true, "epoll_wait error");
 			return -1;
 		}
-	}
-
-	if (epoll_ret == 0)
-	{
 		return 0;
 	}
+	else if (epoll_ret == 0)
+	{
 
-	FillActiveChannelList(epoll_ret, active_channel_list);
+	}
+	else
+	{
+		FillActiveChannelList(epoll_ret, active_channel_list);
+	}
 
 	return epoll_ret;
 }
@@ -91,17 +78,14 @@ void MultiplexEpoll::FillActiveChannelList(int active_event_num, MultiplexBase::
 	}
 }
 
-bool MultiplexEpoll::UpdateChannelEvent(Channel* channel, int option) const
+bool MultiplexEpoll::UpdateChannelEvent(Channel* channel, int event, int option) const
 {
 	if (channel == nullptr)
 	{
 		return false;
 	}
 	struct epoll_event ev{};
-
-	uint32_t event = EPOLLET;
-	event |= channel->GetRegisterReadable() ? EPOLLIN : 0;
-	event |= channel->GetRegisterWritable() ? EPOLLOUT : 0;
+	ev.events = event;
 
 	ev.data.ptr = reinterpret_cast<void*>(channel);
 	ev.events = event;
@@ -114,4 +98,51 @@ bool MultiplexEpoll::UpdateChannelEvent(Channel* channel, int option) const
 			channel->GetFd());
 
 	return result;
+}
+
+void MultiplexEpoll::UpdateChannel(Channel* channel)
+{
+	if (!channel)
+	{
+		return;
+	}
+
+	int event = EPOLL_DEFAULT_EVENT;
+	event |= channel->GetRegisterWritable() ? EPOLLOUT : 0;
+	event |= channel->GetRegisterReadable() ? EPOLLIN : 0;
+
+	/**
+	 * 当Channel未被注册时 如果没有设定事件则错误 设定了事件则添加Channel
+	 * 当Channel注册后, 如果事件为空则清除Channel, 否则修改注册事件
+	 */
+
+	switch (channel->GetChannelStatus())
+	{
+		case Channel::CHANNEL_NOT_ADDED:
+		{
+			if (event == EPOLL_DEFAULT_EVENT)
+			{
+				LOG_IF(true, "CHANNEL_NOT_ADDED but no event");
+			}
+			else
+			{
+				UpdateChannelEvent(channel, event, EPOLL_CTL_ADD);
+				channel->SetChannelStatus(Channel::CHANNEL_ADDED);
+			}
+			break;
+		}
+		case Channel::CHANNEL_ADDED:
+		{
+			if (event == EPOLL_DEFAULT_EVENT)
+			{
+				UpdateChannelEvent(channel, event, EPOLL_CTL_MOD);
+			}
+			else
+			{
+				UpdateChannelEvent(channel, 0, EPOLL_CTL_DEL);
+				channel->SetChannelStatus(Channel::CHANNEL_NOT_ADDED);
+			};
+			break;
+		}
+	}
 }

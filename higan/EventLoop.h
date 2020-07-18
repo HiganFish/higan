@@ -13,6 +13,8 @@
 
 namespace higan
 {
+
+class Channel;
 /**
  * 事件循环类统一所有不同的事件循环
  */
@@ -27,6 +29,8 @@ public:
 
 	void Loop();
 
+	void UpdateChannel(Channel* channel);
+
 	/**
 	 * 在事件循环中执行函数  当前如果正在调用事件处理函数 则延迟调用 否则立即调用
 	 * @param func
@@ -36,6 +40,9 @@ private:
 
 	std::unique_ptr<MultiplexBase> multiplex_base_;
 
+	/**
+	 * 就绪Channel列表
+	 */
 	MultiplexBase::ChannelList active_channel_list_;
 
 	bool handling_pending_event_;

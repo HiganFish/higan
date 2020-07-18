@@ -14,18 +14,9 @@ MultiplexBase::~MultiplexBase()
 {
 
 }
-bool MultiplexBase::Add(Channel* channel)
+void MultiplexBase::UpdateChannel(Channel *channel)
 {
-	return false;
-}
-bool MultiplexBase::Modify(Channel* channel)
-{
-	return false;
-}
 
-bool MultiplexBase::Delete(Channel* channel)
-{
-	return false;
 }
 
 int MultiplexBase::LoopOnce(int timeout, MultiplexBase::ChannelList* active_channel_list)

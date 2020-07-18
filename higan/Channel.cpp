@@ -3,16 +3,19 @@
 //
 
 #include "higan/Channel.h"
+#include "higan/EventLoop.h"
 
 using namespace higan;
 
-Channel::Channel(int fd):
-fd_(fd),
-register_readable_(false),
-register_writable_(false),
-channel_readable_(false),
-channel_writable_(false),
-channel_error_(false)
+Channel::Channel(EventLoop* loop, int fd):
+		loop_(loop),
+		fd_(fd),
+		register_readable_(false),
+		register_writable_(false),
+		channel_readable_(false),
+		channel_writable_(false),
+		channel_error_(false),
+		channel_status_(CHANNEL_NOT_ADDED)
 {
 
 }
@@ -20,21 +23,6 @@ channel_error_(false)
 Channel::~Channel()
 {
 
-}
-
-bool Channel::GetChannelReadable() const
-{
-	return channel_readable_;
-}
-
-bool Channel::GetChannelWritable() const
-{
-	return channel_writable_;
-}
-
-bool Channel::GetChannelError() const
-{
-	return channel_error_;
 }
 
 int Channel::GetFd() const
@@ -55,21 +43,32 @@ bool Channel::GetRegisterWritable() const
 void Channel::EnableReadable()
 {
 	register_readable_ = true;
+	loop_->UpdateChannel(this);
 }
 
 void Channel::DisableReadable()
 {
 	register_readable_ = false;
+	loop_->UpdateChannel(this);
 }
 
 void Channel::EnableWritable()
 {
 	register_writable_ = true;
+	loop_->UpdateChannel(this);
 }
 
 void Channel::DisableWritable()
 {
 	register_writable_ = false;
+	loop_->UpdateChannel(this);
+}
+
+void Channel::DisableAll()
+{
+	register_writable_ = false;
+	register_readable_ = false;
+	loop_->UpdateChannel(this);
 }
 
 void Channel::SetChannelReadable(bool ready)
@@ -89,5 +88,54 @@ void Channel::SetChannelError(bool ready)
 
 void Channel::HandleEvent()
 {
+	if (channel_error_)
+	{
+		if (error_handle_)
+		{
+			error_handle_();
+		}
+		return;
+	}
 
+	if (channel_readable_)
+	{
+		if (readable_handle_)
+		{
+			readable_handle_();
+		}
+	}
+
+	if (channel_writable_)
+	{
+		if (writable_handle_)
+		{
+			writable_handle_();
+		}
+	}
+}
+
+void Channel::SetErrorHandle(const Channel::ChannelHandleFunc& func)
+{
+	error_handle_ = func;
+}
+
+void Channel::SetWritableHandle(const Channel::ChannelHandleFunc& func)
+{
+	writable_handle_ = func;
+
+}
+
+void Channel::SetReadableHandle(const Channel::ChannelHandleFunc& func)
+{
+	readable_handle_ = func;
+}
+
+Channel::ChannelStatus Channel::GetChannelStatus() const
+{
+	return channel_status_;
+}
+
+void Channel::SetChannelStatus(Channel::ChannelStatus status)
+{
+	channel_status_ = status;
 }

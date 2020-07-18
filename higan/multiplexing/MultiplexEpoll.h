@@ -15,32 +15,17 @@ class MultiplexEpoll : public MultiplexBase
 {
 public:
 
-	const static int EPOLL_MAX_EVNETS = 100;
+	const static int EPOLL_MAX_EVNETS;
 
 	MultiplexEpoll();
 	~MultiplexEpoll();
 
 
 	/**
-	 * 增加新的Channel到多路复用中, 同时注册入channel_list, 同时更新Channel状态
-	 * @param channel 待添加的Channel
-	 * @return true for success
+	 * 根据channel状态更新
+	 * @param channel
 	 */
-	bool Add(Channel* channel) override;
-
-	/**
-	 * 更新Channel
-	 * @param channel 待更新的Channel, 同时更新Channel状态
-	 * @return true for success
-	 */
-	bool Modify(Channel* channel) override;
-
-	/**
-	 * 从路复用中删除Channel, 同时同channel_list中移除, 同时更新Channel状态
-	 * @param channel 待删除的Channel
-	 * @return true for success
-	 */
-	bool Delete(Channel* channel) override;
+	void UpdateChannel(Channel* channel) override;
 
 	/**
 	 * 执行一次多路复用
@@ -49,12 +34,18 @@ public:
 	 * @return 就绪事件数量 -1出错 0超时
 	 */
 	int LoopOnce(int timeout, MultiplexBase::ChannelList* active_channel_list) override;
+
 private:
 
 	int epollfd_;
+	/**
+	 * 默认的epoll_event事件
+	 */
+	const static int EPOLL_DEFAULT_EVENT;
 
-
-
+	/**
+	 * 存放epoll_wait返回的事件
+	 */
 	std::vector<epoll_event> epoll_events_;
 
 	/**
@@ -70,7 +61,7 @@ private:
 	 * @param option EPOLL_CTL_ADD EPOLL_CTL_DEL EPOLL_CTL_MOD
 	 * @return ok for true
 	 */
-	bool UpdateChannelEvent(Channel* channel, int option) const;
+	bool UpdateChannelEvent(Channel* channel, int event, int option) const;
 };
 }
 #endif //_MULTIPLEXEPOLL_H_
