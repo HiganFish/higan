@@ -7,12 +7,13 @@
 
 #include <vector>
 #include <ctime>
+#include "higan/utils/noncopyable.h"
 
 namespace higan
 {
 class Channel;
 
-class MultiplexBase
+class MultiplexBase : public noncopyable
 {
 public:
 

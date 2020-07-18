@@ -7,12 +7,13 @@
 
 #include <functional>
 
+#include "higan/utils/noncopyable.h"
 
 namespace higan
 {
 
 class EventLoop;
-class Channel
+class Channel : public noncopyable
 {
 public:
 

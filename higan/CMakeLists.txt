@@ -7,6 +7,7 @@ SET(SRCS_FILES
         Acceptor.cpp
         Socket.cpp
         InetAddress.cpp
+        TcpServer.cpp
 )
 
 SET(HEADERS_FILES
@@ -14,10 +15,13 @@ SET(HEADERS_FILES
         multiplexing/MultiplexEpoll.h
         Channel.h
         utils/Logger.h
+        utils/copyable.h
+        utils/noncopyable.h
         EventLoop.h
         Acceptor.h
         Socket.h
-        InetAddress.cpp
+        InetAddress.h
+        TcpServer.h
 )
 
 add_library(higan_net ${SRCS_FILES} ${HEADERS_FILES})

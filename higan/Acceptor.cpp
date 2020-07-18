@@ -13,6 +13,8 @@ Acceptor::Acceptor(EventLoop* loop, const InetAddress& address):
 {
 	listening_socket_.Bind();
 	channel_.EnableReadable();
+
+	channel_.SetReadableHandle(std::bind(&Acceptor::OnNewConnection, this));
 }
 
 Acceptor::~Acceptor()
@@ -23,4 +25,10 @@ Acceptor::~Acceptor()
 void Acceptor::Listen()
 {
 	listening_socket_.Listen();
+}
+
+
+void Acceptor::OnNewConnection()
+{
+
 }

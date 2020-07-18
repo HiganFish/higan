@@ -8,10 +8,12 @@
 #include <string>
 #include <sys/socket.h>
 
+#include "higan/utils/copyable.h"
+
 namespace higan
 {
 
-class InetAddress
+class InetAddress : public copyable
 {
 public:
 

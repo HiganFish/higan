@@ -9,10 +9,11 @@
 
 #include "higan/Socket.h"
 #include "higan/Channel.h"
+#include "higan/utils/noncopyable.h"
 
 namespace higan
 {
-class Acceptor
+class Acceptor : public noncopyable
 {
 public:
 	/**
@@ -34,6 +35,8 @@ private:
 	Socket listening_socket_;
 
 	Channel channel_;
+
+	void OnNewConnection();
 };
 }
 

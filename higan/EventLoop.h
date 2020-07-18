@@ -18,7 +18,7 @@ class Channel;
 /**
  * 事件循环类统一所有不同的事件循环
  */
-class EventLoop
+class EventLoop : public noncopyable
 {
 public:
 

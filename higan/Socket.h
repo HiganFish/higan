@@ -6,10 +6,11 @@
 #define HIGAN_SOCKET_H
 
 #include "higan/InetAddress.h"
+#include "higan/utils/noncopyable.h"
 
 namespace higan
 {
-class Socket
+class Socket : public noncopyable
 {
 public:
 	explicit Socket(const InetAddress& address);
