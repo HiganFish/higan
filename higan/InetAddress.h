@@ -7,6 +7,8 @@
 
 #include <string>
 #include <sys/socket.h>
+#include <arpa/inet.h>
+#include <netinet/in.h>
 
 #include "higan/utils/copyable.h"
 
@@ -17,6 +19,7 @@ class InetAddress : public copyable
 {
 public:
 
+	InetAddress();
 	/**
 	 * 提供端口号, 绑定0.0.0.0地址
 	 * @param port
@@ -31,10 +34,12 @@ public:
 	 */
 	void GetSockaddr(sockaddr* addr);
 
+	void SetSockaddr(sockaddr_in* addr);
+
 	/**
 	 * @return ip:port
 	 */
-	std::string GetIpPort();
+	std::string GetIpPort() const;
 private:
 
 	std::string ip_;

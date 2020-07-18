@@ -50,7 +50,7 @@ void EventLoop::Loop()
 			HandleActiveEvent(multiplex_result);
 		}
 
-		HandlePendingFunc();
+		CallPendingFunc();
 	}
 }
 
@@ -69,7 +69,7 @@ void EventLoop::HandleTimeoutEvent(int timeout)
 
 }
 
-void EventLoop::HandlePendingFunc()
+void EventLoop::CallPendingFunc()
 {
 	while (!pending_func_queue_.empty())
 	{

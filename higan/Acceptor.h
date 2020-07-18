@@ -16,6 +16,9 @@ namespace higan
 class Acceptor : public noncopyable
 {
 public:
+
+	typedef std::function<void(int, const InetAddress&)> NewConnectionCallback;
+
 	/**
 	 * 提供事件循环和绑定地址
 	 * @param loop 事件循环
@@ -29,6 +32,8 @@ public:
 	 */
 	void Listen();
 
+	void SetNewConnectionCallback(const NewConnectionCallback& callback);
+
 private:
 	EventLoop* loop_;
 
@@ -36,7 +41,9 @@ private:
 
 	Channel channel_;
 
-	void OnNewConnection();
+	NewConnectionCallback newconnection_callback_;
+
+	void OnNewConnectionInternal();
 };
 }
 

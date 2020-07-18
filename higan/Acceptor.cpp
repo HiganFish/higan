@@ -14,12 +14,12 @@ Acceptor::Acceptor(EventLoop* loop, const InetAddress& address):
 	listening_socket_.Bind();
 	channel_.EnableReadable();
 
-	channel_.SetReadableHandle(std::bind(&Acceptor::OnNewConnection, this));
+	channel_.SetReadableCallback(std::bind(&Acceptor::OnNewConnectionInternal, this));
 }
 
 Acceptor::~Acceptor()
 {
-
+	channel_.DisableAll();
 }
 
 void Acceptor::Listen()
@@ -28,7 +28,22 @@ void Acceptor::Listen()
 }
 
 
-void Acceptor::OnNewConnection()
+void Acceptor::OnNewConnectionInternal()
 {
+	InetAddress address{};
+	int client_fd = listening_socket_.Accept(&address);
 
+	if (newconnection_callback_)
+	{
+		newconnection_callback_(client_fd, address);
+	}
+	else
+	{
+		Socket::CloseFd(client_fd);
+	}
+}
+
+void Acceptor::SetNewConnectionCallback(const Acceptor::NewConnectionCallback& callback)
+{
+	newconnection_callback_ = callback;
 }

@@ -7,7 +7,7 @@
 
 int main()
 {
-	higan::InetAddress address(1023);
+	higan::InetAddress address(1024);
 
 	higan::EventLoop loop;
 

@@ -5,7 +5,7 @@
 #ifndef HIGAN_COPYABLE_H
 #define HIGAN_COPYABLE_H
 
-namespace
+namespace higan
 {
 class copyable
 {

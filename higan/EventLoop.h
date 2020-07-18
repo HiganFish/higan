@@ -54,7 +54,7 @@ private:
 
 	void HandleTimeoutEvent(int timeout);
 
-	void HandlePendingFunc();
+	void CallPendingFunc();
 };
 }
 #endif //HIGAN_EVENTLOOP_H

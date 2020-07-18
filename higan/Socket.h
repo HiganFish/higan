@@ -23,6 +23,15 @@ public:
 
 	int GetFd() const ;
 
+	/**
+	 * 接收新的连接
+	 * @param address 存储新连接的地址
+	 * @return 新连接的socket描述符 -1代表出错
+	 */
+	int Accept(InetAddress* address);
+
+	static void CloseFd(int fd);
+
 private:
 	int fd_;
 

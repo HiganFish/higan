@@ -90,44 +90,44 @@ void Channel::HandleEvent()
 {
 	if (channel_error_)
 	{
-		if (error_handle_)
+		if (error_callback_)
 		{
-			error_handle_();
+			error_callback_();
 		}
 		return;
 	}
 
 	if (channel_readable_)
 	{
-		if (readable_handle_)
+		if (readable_callback_)
 		{
-			readable_handle_();
+			readable_callback_();
 		}
 	}
 
 	if (channel_writable_)
 	{
-		if (writable_handle_)
+		if (writable_callback_)
 		{
-			writable_handle_();
+			writable_callback_();
 		}
 	}
 }
 
-void Channel::SetErrorHandle(const Channel::ChannelHandleFunc& func)
+void Channel::SetErrorCallback(const ChannelCallbackFunc& cb)
 {
-	error_handle_ = func;
+	error_callback_ = cb;
 }
 
-void Channel::SetWritableHandle(const Channel::ChannelHandleFunc& func)
+void Channel::SetWritableCallback(const ChannelCallbackFunc& cb)
 {
-	writable_handle_ = func;
+	writable_callback_ = cb;
 
 }
 
-void Channel::SetReadableHandle(const Channel::ChannelHandleFunc& func)
+void Channel::SetReadableCallback(const ChannelCallbackFunc& cb)
 {
-	readable_handle_ = func;
+	readable_callback_ = cb;
 }
 
 Channel::ChannelStatus Channel::GetChannelStatus() const

@@ -4,6 +4,7 @@
 
 #include <sys/socket.h>
 #include <unistd.h>
+#include <netinet/in.h>
 
 #include "higan/utils/Logger.h"
 #include "higan/Socket.h"
@@ -46,4 +47,28 @@ void Socket::Listen()
 int Socket::GetFd() const
 {
 	return fd_;
+}
+
+
+int Socket::Accept(InetAddress* address)
+{
+	if (address == nullptr)
+	{
+		return -1;
+	}
+
+	struct sockaddr_in client_addr{};
+	socklen_t sockaddr_len = static_cast<socklen_t>(sizeof client_addr);
+
+	int result_fd = accept4(fd_, reinterpret_cast<sockaddr*>(&client_addr),
+			&sockaddr_len, SOCK_CLOEXEC);
+
+	address->SetSockaddr(&client_addr);
+
+	return result_fd;
+}
+
+void Socket::CloseFd(int fd)
+{
+	close(fd);
 }
