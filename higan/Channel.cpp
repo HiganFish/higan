@@ -3,13 +3,16 @@
 //
 
 #include "higan/Channel.h"
+#include "higan/utils/Logger.h"
 #include "higan/EventLoop.h"
 
 using namespace higan;
 
-Channel::Channel(EventLoop* loop, int fd):
+Channel::Channel(EventLoop* loop, const std::string& connection_name,int fd):
 		loop_(loop),
+		connection_name_(connection_name),
 		fd_(fd),
+		connecting_(true),
 		register_readable_(false),
 		register_writable_(false),
 		channel_readable_(false),
@@ -66,9 +69,12 @@ void Channel::DisableWritable()
 
 void Channel::DisableAll()
 {
-	register_writable_ = false;
-	register_readable_ = false;
-	loop_->UpdateChannel(this);
+	if (register_readable_ || register_writable_)
+	{
+		register_writable_ = false;
+		register_readable_ = false;
+		loop_->UpdateChannel(this);
+	}
 }
 
 void Channel::SetChannelReadable(bool ready)
@@ -88,8 +94,19 @@ void Channel::SetChannelError(bool ready)
 
 void Channel::HandleEvent()
 {
+	if (!connecting_)
+	{
+		LOG("connection: %s closed!!!!!", connection_name_.c_str());
+		return;
+	}
+
 	if (channel_error_)
 	{
+		/**
+		 * 默认在 错误和可读同时触发时执行错误回调
+		 * 是否会丢失数据?
+		 */
+		connecting_ = false;
 		if (error_callback_)
 		{
 			error_callback_();
@@ -114,18 +131,18 @@ void Channel::HandleEvent()
 	}
 }
 
-void Channel::SetErrorCallback(const ChannelCallbackFunc& cb)
+void Channel::SetErrorCallback(const ChannelCallback& cb)
 {
 	error_callback_ = cb;
 }
 
-void Channel::SetWritableCallback(const ChannelCallbackFunc& cb)
+void Channel::SetWritableCallback(const ChannelCallback& cb)
 {
 	writable_callback_ = cb;
 
 }
 
-void Channel::SetReadableCallback(const ChannelCallbackFunc& cb)
+void Channel::SetReadableCallback(const ChannelCallback& cb)
 {
 	readable_callback_ = cb;
 }

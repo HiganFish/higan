@@ -2,7 +2,8 @@
 // Created by rjd67 on 2020/7/18.
 //
 
-#include "TcpServer.h"
+#include "higan/TcpServer.h"
+#include "higan/utils/Logger.h"
 
 using namespace higan;
 
@@ -27,7 +28,36 @@ void TcpServer::Start()
 
 void TcpServer::OnNewConnection(int socket, const InetAddress& address)
 {
-	printf("%d--%s\n", socket, address.GetIpPort().c_str());
+	std::string connection_name = server_name_ + "-" + address.GetIpPort();
 
-	Socket::CloseFd(socket);
+	TcpConnection::TcpConnectionPtr connection_ptr(
+			new TcpConnection(loop_, connection_name, socket, address));
+	connection_ptr->SetReadableCallback(std::bind(&TcpServer::OnConnectionReadable, this, std::placeholders::_1));
+	connection_ptr->SetWritableCallback(std::bind(&TcpServer::OnConnectionWritable, this, std::placeholders::_1));
+	connection_ptr->SetErrorCallback(std::bind(&TcpServer::OnConnectionError, this, std::placeholders::_1));
+
+
+	LOG("a new connection %s create", connection_name.c_str());
+	connection_map_.insert({socket, connection_ptr});
+
+	connection_ptr->ConnectionEstablished();
+}
+
+void TcpServer::OnConnectionReadable(const TcpConnection::TcpConnectionPtr& connection_ptr)
+{
+
+}
+
+void TcpServer::OnConnectionWritable(const TcpConnection::TcpConnectionPtr& connection_ptr)
+{
+
+}
+
+void TcpServer::OnConnectionError(const TcpConnection::TcpConnectionPtr& connection_ptr)
+{
+	std::string connection_name = connection_ptr->GetConnectionName();
+	LOG("connection %s closed", connection_name.c_str());
+
+
+	connection_map_.erase(connection_ptr->GetFd());
 }

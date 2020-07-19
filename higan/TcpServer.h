@@ -6,11 +6,12 @@
 #define HIGAN_TCPSERVER_H
 
 #include <string>
+#include <map>
 
 #include "higan/utils/noncopyable.h"
-#include "higan/InetAddress.h"
 #include "higan/Acceptor.h"
 #include "higan/EventLoop.h"
+#include "higan/TcpConnection.h"
 
 namespace higan
 {
@@ -29,10 +30,14 @@ public:
 	void Start();
 private:
 
+	typedef std::map<int, TcpConnection::TcpConnectionPtr> TcpConnectionMap;
+
 	EventLoop* loop_;
 	std::string server_name_;
 
 	Acceptor acceptor_;
+
+	TcpConnectionMap connection_map_;
 
 	/**
 	 * 供Acceptor在 新连接建立后调用
@@ -40,6 +45,14 @@ private:
 	 * @param address 地址
 	 */
 	void OnNewConnection(int socket, const InetAddress& address);
+
+	void OnConnectionReadable(const TcpConnection::TcpConnectionPtr& connection_ptr);
+
+	void OnConnectionWritable(const TcpConnection::TcpConnectionPtr& connection_ptr);
+
+	void OnConnectionError(const TcpConnection::TcpConnectionPtr& connection_ptr);
+
+
 };
 }
 

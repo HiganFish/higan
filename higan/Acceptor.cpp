@@ -9,7 +9,7 @@ using namespace higan;
 Acceptor::Acceptor(EventLoop* loop, const InetAddress& address):
 		loop_(loop),
 		listening_socket_(address),
-		channel_(loop_, listening_socket_.GetFd())
+		channel_(loop_, "acceptor", listening_socket_.GetFd())
 {
 	listening_socket_.Bind();
 	channel_.EnableReadable();

@@ -23,14 +23,14 @@ public:
 		CHANNEL_ADDED,
 	};
 
-	typedef std::function<void()> ChannelCallbackFunc;
+	typedef std::function<void()> ChannelCallback;
 
 	/**
 	 * 提供事件循环与channel所属的socket描述符
 	 * @param loop
 	 * @param fd
 	 */
-	Channel(EventLoop* loop, int fd);
+	Channel(EventLoop* loop, const std::string& connection_name, int fd);
 	~Channel();
 
 	int GetFd() const;
@@ -64,9 +64,9 @@ public:
 	 */
 	void HandleEvent();
 
-	void SetErrorCallback(const ChannelCallbackFunc& cb);
-	void SetWritableCallback(const ChannelCallbackFunc& cb);
-	void SetReadableCallback(const ChannelCallbackFunc& cb);
+	void SetErrorCallback(const ChannelCallback& cb);
+	void SetWritableCallback(const ChannelCallback& cb);
+	void SetReadableCallback(const ChannelCallback& cb);
 
 	ChannelStatus GetChannelStatus() const;
 
@@ -74,7 +74,10 @@ public:
 private:
 
 	EventLoop* loop_;
+	std::string connection_name_;
 	int fd_;
+
+	bool connecting_;
 
 	/**
 	 * 是否注册可读事件
@@ -101,9 +104,9 @@ private:
 	 */
 	bool channel_error_;
 
-	ChannelCallbackFunc error_callback_;
-	ChannelCallbackFunc writable_callback_;
-	ChannelCallbackFunc readable_callback_;
+	ChannelCallback error_callback_;
+	ChannelCallback writable_callback_;
+	ChannelCallback readable_callback_;
 
 	ChannelStatus channel_status_;
 };
