@@ -9,6 +9,8 @@ SET(SRCS_FILES
         InetAddress.cpp
         TcpServer.cpp
         TcpConnection.cpp
+        Buffer.cpp
+        utils/System.cpp
 )
 
 SET(HEADERS_FILES
@@ -24,6 +26,8 @@ SET(HEADERS_FILES
         InetAddress.h
         TcpServer.h
         TcpConnection.h
+        Buffer.h
+        utils/System.h
 )
 
 add_library(higan_net ${SRCS_FILES} ${HEADERS_FILES})
