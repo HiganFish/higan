@@ -10,6 +10,8 @@
 
 #include "higan/Channel.h"
 #include "higan/Socket.h"
+#include "higan/Buffer.h"
+#include "higan/Callback.h"
 
 namespace higan
 {
@@ -18,8 +20,7 @@ class TcpConnection : public std::enable_shared_from_this<TcpConnection> // 这�
 																	// 开始确实发现了 _M_weak_this get()显示null 不过却不知道是这个原因
 {
 public:
-	typedef std::shared_ptr<TcpConnection> TcpConnectionPtr;
-	typedef std::function<void(const TcpConnectionPtr&)> TcpConnectionCallback;
+
 
 	/**
 	 * Tcpconnection 负责维护连接 读写缓冲区
@@ -34,8 +35,8 @@ public:
 
 	void ConnectionEstablished();
 
-	void SetReadableCallback(const TcpConnectionCallback& callback);
-	void SetWritableCallback(const TcpConnectionCallback& callback);
+	void SetNewConnectionCallback(const TcpConnectionCallback& callback);
+	void SetMessageCallback(const MessageCallback& callback);
 	void SetErrorCallback(const TcpConnectionCallback& callback);
 
 	const std::string& GetConnectionName() const;
@@ -49,9 +50,12 @@ private:
 
 	Channel channel_;
 
-	TcpConnectionCallback readable_callback_;
-	TcpConnectionCallback writable_callback_;
+	Buffer input_buffer_;
+	Buffer output_buffer_;
+
+	MessageCallback message_callback_;
 	TcpConnectionCallback error_callback_;
+	TcpConnectionCallback new_connection_callback_;
 
 	void OnReadable();
 

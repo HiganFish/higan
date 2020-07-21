@@ -7,6 +7,7 @@
 
 #include <vector>
 #include <unistd.h>
+#include <string>
 
 namespace higan
 {
@@ -53,6 +54,8 @@ public:
 
 	void AddReadIndex(ssize_t index);
 	void AddWriteIndex(ssize_t index);
+
+	std::string ReadAllAsString();
 private:
 	std::vector<char> buffer_;
 

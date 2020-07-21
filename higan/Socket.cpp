@@ -39,6 +39,24 @@ void Socket::Bind()
 	LOG_IF(result == -1, "bind on %s error", address_.GetIpPort().c_str());
 }
 
+void Socket::SetReuseAddr()
+{
+	int on = 1;
+	int result = setsockopt(fd_, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<void*>(&on),
+			static_cast<socklen_t>(sizeof on));
+
+	LOG_IF(result == -1, "set socket reuse addr error");
+}
+
+void Socket::SetReusePort()
+{
+	int on = 1;
+	int result = setsockopt(fd_, SOL_SOCKET, SO_REUSEPORT, reinterpret_cast<void*>(&on),
+			static_cast<socklen_t>(sizeof on));
+
+	LOG_IF(result == -1, "set socket reuse port error");
+}
+
 void Socket::Listen()
 {
 	listen(fd_, 5);

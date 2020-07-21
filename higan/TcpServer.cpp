@@ -13,7 +13,7 @@ TcpServer::TcpServer(EventLoop* loop, const InetAddress& addr, const std::string
 		server_name_(server_name)
 {
 	acceptor_.SetNewConnectionCallback(std::bind(&TcpServer::OnNewConnection,
-			this, std::placeholders::_1, std::placeholders::_2));
+			this, _1, _2));
 }
 
 TcpServer::~TcpServer()
@@ -30,12 +30,11 @@ void TcpServer::OnNewConnection(int socket, const InetAddress& address)
 {
 	std::string connection_name = server_name_ + "-" + address.GetIpPort();
 
-	TcpConnection::TcpConnectionPtr connection_ptr(
+	TcpConnectionPtr connection_ptr(
 			new TcpConnection(loop_, connection_name, socket, address));
-	connection_ptr->SetReadableCallback(std::bind(&TcpServer::OnConnectionReadable, this, std::placeholders::_1));
-	connection_ptr->SetWritableCallback(std::bind(&TcpServer::OnConnectionWritable, this, std::placeholders::_1));
-	connection_ptr->SetErrorCallback(std::bind(&TcpServer::OnConnectionError, this, std::placeholders::_1));
-
+	connection_ptr->SetMessageCallback(message_callback_);
+	connection_ptr->SetErrorCallback(std::bind(&TcpServer::OnConnectionError, this, _1));
+	connection_ptr->SetNewConnectionCallback(newconnection_callback_);
 
 	LOG("a new connection %s create", connection_name.c_str());
 	connection_map_.insert({socket, connection_ptr});
@@ -43,21 +42,28 @@ void TcpServer::OnNewConnection(int socket, const InetAddress& address)
 	connection_ptr->ConnectionEstablished();
 }
 
-void TcpServer::OnConnectionReadable(const TcpConnection::TcpConnectionPtr& connection_ptr)
-{
 
+void TcpServer::OnConnectionError(const TcpConnectionPtr& connection_ptr)
+{
+	RemoveConnection(connection_ptr);
 }
 
-void TcpServer::OnConnectionWritable(const TcpConnection::TcpConnectionPtr& connection_ptr)
-{
-
-}
-
-void TcpServer::OnConnectionError(const TcpConnection::TcpConnectionPtr& connection_ptr)
+void TcpServer::RemoveConnection(const TcpConnectionPtr& connection_ptr)
 {
 	std::string connection_name = connection_ptr->GetConnectionName();
 	LOG("connection %s closed", connection_name.c_str());
 
-
 	connection_map_.erase(connection_ptr->GetFd());
 }
+
+
+void TcpServer::SetMessageCallback(const MessageCallback & callback)
+{
+	message_callback_ = callback;
+}
+
+void TcpServer::SetMewConnectionCallback(const TcpConnectionCallback& callback)
+{
+	newconnection_callback_ = callback;
+}
+

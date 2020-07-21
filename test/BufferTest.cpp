@@ -10,21 +10,31 @@
 
 int main()
 {
-	std::string in_file = "/root/jdk-8u261-windows-x64.exe";
-	std::string out_file = in_file + ".copy";
+	std::string in_file = "/tmp/c088313f-7ad5-446c-bdef-522df94cde81.txt";
+	higan::System::RunShellCommand("rm", {"-f", in_file});
 
-	higan::System::RunShellCommand("rm", {"-f", out_file});
+	int in_fd = open(in_file.c_str(), O_WRONLY | O_CREAT);
 
-	int in_fd = open(in_file.c_str(), O_RDONLY);
-	int out_fd = open(out_file.c_str(), O_WRONLY | O_CREAT);
-
-	if (in_fd < 0 || out_fd < 0)
+	char random_buffer[1024];
+	int file_size = 100; // 单位k
+	for (int i = 0; i < file_size; ++i)
 	{
-		return -1;
+		for (char& c : random_buffer)
+		{
+			c = static_cast<char>(random() % 26 + 65);
+		}
+		write(in_fd, random_buffer, sizeof random_buffer);
 	}
 
-	higan::Buffer buffer;
 
+	std::string out_file = in_file + ".copy";
+	higan::System::RunShellCommand("rm", {"-f", out_file});
+
+	int out_fd = open(out_file.c_str(), O_WRONLY | O_CREAT);
+	close(in_fd);
+	in_fd = open(in_file.c_str(), O_RDONLY);
+
+	higan::Buffer buffer;
 	while (buffer.ReadFromFd(in_fd) > 0)
 	{
 		ssize_t write_size = write(out_fd, buffer.ReadBegin(), buffer.ReadableSize());
@@ -33,6 +43,9 @@ int main()
 
 	std::cout << higan::System::RunShellCommand("md5sum", {in_file});
 	std::cout << higan::System::RunShellCommand("md5sum", {out_file});
+
+	close(in_fd);
+	close(out_fd);
 
 	return 0;
 }

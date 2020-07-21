@@ -129,3 +129,10 @@ void Buffer::AddWriteIndex(ssize_t index)
 	}
 }
 
+std::string Buffer::ReadAllAsString()
+{
+	std::string result(ReadBegin(), ReadableSize());
+	AddReadIndex(ReadableSize());
+	return result;
+}
+

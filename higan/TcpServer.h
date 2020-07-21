@@ -28,9 +28,13 @@ public:
 	~TcpServer();
 
 	void Start();
+
+	void SetMessageCallback(const MessageCallback& callback);
+	void SetMewConnectionCallback(const TcpConnectionCallback& callback);
+
 private:
 
-	typedef std::map<int, TcpConnection::TcpConnectionPtr> TcpConnectionMap;
+	typedef std::map<int, TcpConnectionPtr> TcpConnectionMap;
 
 	EventLoop* loop_;
 	std::string server_name_;
@@ -39,6 +43,10 @@ private:
 
 	TcpConnectionMap connection_map_;
 
+	MessageCallback message_callback_;
+	TcpConnectionCallback newconnection_callback_;
+
+
 	/**
 	 * 供Acceptor在 新连接建立后调用
 	 * @param socket 文件描述符
@@ -46,12 +54,9 @@ private:
 	 */
 	void OnNewConnection(int socket, const InetAddress& address);
 
-	void OnConnectionReadable(const TcpConnection::TcpConnectionPtr& connection_ptr);
+	void RemoveConnection(const TcpConnectionPtr& connection_ptr);
 
-	void OnConnectionWritable(const TcpConnection::TcpConnectionPtr& connection_ptr);
-
-	void OnConnectionError(const TcpConnection::TcpConnectionPtr& connection_ptr);
-
+	void OnConnectionError(const TcpConnectionPtr& connection_ptr);
 
 };
 }

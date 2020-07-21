@@ -28,6 +28,7 @@ SET(HEADERS_FILES
         TcpConnection.h
         Buffer.h
         utils/System.h
+        Callback.h
 )
 
 add_library(higan_net ${SRCS_FILES} ${HEADERS_FILES})

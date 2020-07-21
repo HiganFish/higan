@@ -12,6 +12,9 @@ Acceptor::Acceptor(EventLoop* loop, const InetAddress& address):
 		channel_(loop_, "acceptor", listening_socket_.GetFd())
 {
 	listening_socket_.Bind();
+	listening_socket_.SetReuseAddr();
+	listening_socket_.SetReusePort();
+
 	channel_.EnableReadable();
 
 	channel_.SetReadableCallback(std::bind(&Acceptor::OnNewConnectionInternal, this));

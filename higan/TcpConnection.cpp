@@ -28,19 +28,27 @@ TcpConnection::~TcpConnection()
 void TcpConnection::ConnectionEstablished()
 {
 	channel_.EnableReadable();
+
+	if (new_connection_callback_)
+	{
+		new_connection_callback_(shared_from_this());
+	}
 }
 
 void TcpConnection::OnReadable()
 {
-	char read_buffer[100]{};
-	ssize_t len = recv(socket_.GetFd(), read_buffer, sizeof read_buffer, 0);
+	ssize_t len = input_buffer_.ReadFromFd(socket_.GetFd());
+
 	if (len == 0)
 	{
 		OnError();
 	}
 	else
 	{
-		LOG("recv from: %s\n%s\n", connection_name_.c_str(), read_buffer);
+		if (message_callback_)
+		{
+			message_callback_(shared_from_this(), input_buffer_);
+		}
 	}
 }
 
@@ -58,17 +66,12 @@ void TcpConnection::OnError()
 	}
 }
 
-void TcpConnection::SetReadableCallback(const TcpConnection::TcpConnectionCallback& callback)
+void TcpConnection::SetMessageCallback(const MessageCallback& callback)
 {
-	readable_callback_ = callback;
+	message_callback_ = callback;
 }
 
-void TcpConnection::SetWritableCallback(const TcpConnection::TcpConnectionCallback& callback)
-{
-	writable_callback_ = callback;
-}
-
-void TcpConnection::SetErrorCallback(const TcpConnection::TcpConnectionCallback& callback)
+void TcpConnection::SetErrorCallback(const TcpConnectionCallback& callback)
 {
 	error_callback_ = callback;
 }
@@ -81,4 +84,9 @@ const std::string& TcpConnection::GetConnectionName() const
 int TcpConnection::GetFd() const
 {
 	return socket_.GetFd();
+}
+
+void TcpConnection::SetNewConnectionCallback(const TcpConnectionCallback& callback)
+{
+	new_connection_callback_ = callback;
 }

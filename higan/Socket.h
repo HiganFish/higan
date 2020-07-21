@@ -32,6 +32,10 @@ public:
 
 	static void CloseFd(int fd);
 
+	void SetReuseAddr();
+
+	void SetReusePort();
+
 private:
 	int fd_;
 
