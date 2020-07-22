@@ -52,8 +52,8 @@ public:
 	 */
 	ssize_t WritableSize() const;
 
-	void AddReadIndex(ssize_t index);
-	void AddWriteIndex(ssize_t index);
+	void AddReadIndex(size_t index);
+	void AddWriteIndex(size_t index);
 
 	std::string ReadAllAsString();
 private:
@@ -62,19 +62,19 @@ private:
 	/**
 	 * 读下标 防止迭代器失效使用下标
 	 */
-	ssize_t read_idx_;
+	size_t read_idx_;
 
 	/**
 	 * 写下标 防止迭代器失效使用下标
 	 */
-	ssize_t write_idx_;
+	size_t write_idx_;
 
 	/**
 	 * 从字符数组中复制ex_len字节的内容
 	 * @param exbuffer
 	 * @param ex_len
 	 */
-	void CopyExDataToBuffer(const char* exbuffer, ssize_t ex_len);
+	void CopyExDataToBuffer(const char* exbuffer, size_t ex_len);
 };
 }
 

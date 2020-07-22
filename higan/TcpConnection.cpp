@@ -90,3 +90,8 @@ void TcpConnection::SetNewConnectionCallback(const TcpConnectionCallback& callba
 {
 	new_connection_callback_ = callback;
 }
+
+void TcpConnection::SetContext(const std::any& context)
+{
+	context_ = context;
+}

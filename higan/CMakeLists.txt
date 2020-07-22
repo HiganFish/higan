@@ -34,3 +34,5 @@ SET(HEADERS_FILES
 add_library(higan_net ${SRCS_FILES} ${HEADERS_FILES})
 
 include_directories(${CMAKE_SOURCE_DIR})
+
+add_subdirectory(http)

@@ -7,4 +7,7 @@ target_link_libraries(TcpServerTest higan_net)
 add_executable(BufferTest BufferTest.cpp)
 target_link_libraries(BufferTest higan_net)
 
+add_executable(HttpContextTest HttpContextTest.cpp)
+target_link_libraries(HttpContextTest higan_http)
+
 include_directories(${CMAKE_SOURCE_DIR})

@@ -7,6 +7,7 @@
 
 #include <string>
 #include <memory>
+#include <any>
 
 #include "higan/Channel.h"
 #include "higan/Socket.h"
@@ -20,8 +21,6 @@ class TcpConnection : public std::enable_shared_from_this<TcpConnection> // 这�
 																	// 开始确实发现了 _M_weak_this get()显示null 不过却不知道是这个原因
 {
 public:
-
-
 	/**
 	 * Tcpconnection 负责维护连接 读写缓冲区
 	 * @param loop 事件循环
@@ -42,6 +41,8 @@ public:
 	const std::string& GetConnectionName() const;
 
 	int GetFd() const;
+
+	void SetContext(const std::any& context);
 private:
 	EventLoop* loop_;
 	std::string connection_name_;
@@ -56,6 +57,8 @@ private:
 	MessageCallback message_callback_;
 	TcpConnectionCallback error_callback_;
 	TcpConnectionCallback new_connection_callback_;
+
+	std::any context_;
 
 	void OnReadable();
 

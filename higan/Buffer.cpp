@@ -60,7 +60,7 @@ ssize_t Buffer::ReadFromFd(int fd)
 	return read_size;
 }
 
-void Buffer::CopyExDataToBuffer(const char* exbuffer, ssize_t ex_len)
+void Buffer::CopyExDataToBuffer(const char* exbuffer, size_t ex_len)
 {
 
 	ssize_t drop_len = read_idx_ - DEFAULT_READ_INDEX;
@@ -105,7 +105,7 @@ ssize_t Buffer::WritableSize() const
 	return buffer_.size() - write_idx_;
 }
 
-void Buffer::AddReadIndex(ssize_t index)
+void Buffer::AddReadIndex(size_t index)
 {
 	if (index + read_idx_ > buffer_.size())
 	{
@@ -117,7 +117,7 @@ void Buffer::AddReadIndex(ssize_t index)
 	}
 }
 
-void Buffer::AddWriteIndex(ssize_t index)
+void Buffer::AddWriteIndex(size_t index)
 {
 	if (index + write_idx_ > buffer_.size())
 	{
