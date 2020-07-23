@@ -136,3 +136,24 @@ std::string Buffer::ReadAllAsString()
 	return result;
 }
 
+void Buffer::Append(const char* begin, const char* end)
+{
+	if (end <= begin)
+	{
+		return;
+	}
+	Append(begin, end - begin);
+}
+
+void Buffer::Append(const char* begin, size_t len)
+{
+	if (len > ReadableSize())
+	{
+		CopyExDataToBuffer(begin, len);
+	}
+	else
+	{
+		std::copy(begin, begin + len, WriteBegin());
+		AddWriteIndex(len);
+	}
+}

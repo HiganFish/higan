@@ -34,9 +34,26 @@ public:
 	HttpRequest();
 	~HttpRequest();
 
-	void SetMethod(const char* begin, const char* end);
-	void SetUrl(const char* begin, const char* end);
-	void SetVersion(const char* begin, const char* end);
+	/**
+	 * 设置Http请求方法
+	 * @param begin 方法首字节地址
+	 * @param end 方法尾字节后一位地址
+	 */
+	bool SetMethod(const char* begin, const char* end);
+
+	/**
+	 * 设置HTTP请求url
+	 * @param begin url首字节地址
+	 * @param end url尾字节后一位地址
+	 */
+	bool SetUrl(const char* begin, const char* end);
+
+	/**
+	 * 设置版本号
+	 * @param begin 版本号首字节地址
+	 * @param end 版本哈尾字节地址
+	 */
+	bool SetVersion(const char* begin, const char* end);
 
 	HttpRequestMethod GetMethod() const;
 	std::string& GetUrl();
@@ -44,10 +61,10 @@ public:
 
 	/**
 	 * 增加一个 kv对 如 DNT: 1
-	 * @param begin 单条header的头字符指针
-	 * @param end 单条header的尾字符后一位指针
+	 * @param begin 单条header的首字节指针
+	 * @param end 单条header的尾字节后一位指针 不包括 CRLF
 	 */
-	void AddHeader(const char* begin, const char* end);
+	bool AddHeader(const char* begin, const char* end);
 
 	void AppendBody(const char* begin, const char* end);
 private:

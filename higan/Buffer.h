@@ -56,6 +56,10 @@ public:
 	void AddWriteIndex(size_t index);
 
 	std::string ReadAllAsString();
+
+	void Append(const char* begin, const char* end);
+
+	void Append(const char* begin, size_t len);
 private:
 	std::vector<char> buffer_;
 

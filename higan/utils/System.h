@@ -7,6 +7,15 @@
 
 #include <string>
 
+#define CHECK_IF_RETURN(check, result, ret)	\
+do	\
+{	\
+	if ((check) == result)	\
+	{	\
+		return ret;	\
+	}	\
+}while(0)	\
+
 namespace higan
 {
 class System

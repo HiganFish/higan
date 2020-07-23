@@ -5,7 +5,8 @@
 #include <algorithm>
 #include <cstring>
 
-#include "HttpContext.h"
+#include "higan/utils/System.h"
+#include "higan/http/HttpContext.h"
 
 using namespace higan;
 
@@ -59,34 +60,29 @@ ssize_t HttpContext::ParseRequest(const char* begin, size_t len)
 
 ssize_t HttpContext::ParseFirstLine(const char* begin, const char* end)
 {
+	// GET /hello.html HTTP/1.1\r\n
+
 	const char* first_line_end = std::search(begin, end, CRLF, CRLF + CRLF_LEN);
-	if (first_line_end == end)
-	{
-		return 0;
-	}
+	CHECK_IF_RETURN(first_line_end == end, true, 0);
 
+	// GET
 	const char* method_end = std::find(begin, first_line_end, ' ');
-	if (method_end == first_line_end)
-	{
-		return -1;
-	}
-	request_.SetMethod(begin, method_end);
+	CHECK_IF_RETURN(method_end == first_line_end, true, -1);
+	CHECK_IF_RETURN(request_.SetMethod(begin, method_end), false, -1);
 
+
+	// /hello.html
 	const char* url_end = std::find(method_end + 1, first_line_end, ' ');
-	if (url_end == first_line_end)
-	{
-		return -1;
-	}
-	request_.SetUrl(method_end + 1, url_end);
+	CHECK_IF_RETURN(url_end == first_line_end, true, -1);
+	CHECK_IF_RETURN(request_.SetUrl(method_end + 1, url_end), false, -1);
 
-	if (first_line_end - url_end != 9)
-	{
-		return -1;
-	}
-	request_.SetVersion(url_end + 1, first_line_end);
+
+	CHECK_IF_RETURN(first_line_end - url_end != 9, true, -1);
+	// HTTP/1.1
+	CHECK_IF_RETURN(request_.SetVersion(url_end + 1, first_line_end), false, -1);
+
 
 	status_ = PARSE_HEADERS;
-
 	return first_line_end - begin + CRLF_LEN;
 }
 
@@ -97,15 +93,31 @@ ssize_t HttpContext::ParseHeader(const char* begin, const char* end)
 
 	while ((line_end = std::search(line_begin, end, CRLF, CRLF + CRLF_LEN)) != end)
 	{
+		/**
+		 * xxxx: xxxCRLFCRLF
+		 * 搜索到两个连续的CRLF代表首部结束
+		 */
 		if (line_begin == line_end)
 		{
 			status_ = PARSE_ALL;
-			return line_end + CRLF_LEN - begin;
+			break;
 		}
 
-		request_.AddHeader(line_begin, line_end);
+		CHECK_IF_RETURN(request_.AddHeader(line_begin, line_end), false, -1);
+
 		line_begin = line_end + CRLF_LEN;
 	}
 
 	return line_end + CRLF_LEN - begin;
+}
+
+void HttpContext::Reset()
+{
+	status_ = PARSE_FIRST_LINE;
+	request_ = HttpRequest();
+}
+
+HttpRequest& HttpContext::GetRequest()
+{
+	return request_;
 }

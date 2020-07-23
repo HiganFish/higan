@@ -25,7 +25,7 @@ HttpRequest::~HttpRequest()
 
 }
 
-void HttpRequest::SetMethod(const char* begin, const char* end)
+bool HttpRequest::SetMethod(const char* begin, const char* end)
 {
 	std::string method(begin, end);
 
@@ -45,14 +45,25 @@ void HttpRequest::SetMethod(const char* begin, const char* end)
 	{
 		method_ = HTTP_REQUEST_DELETE;
 	}
+	else
+	{
+		return false;
+	}
+	return true;
 }
 
-void HttpRequest::SetUrl(const char* begin, const char* end)
+bool HttpRequest::SetUrl(const char* begin, const char* end)
 {
+	if (end - begin < 1)
+	{
+		return false;
+	}
 	url_.append(begin, end);
+
+	return true;
 }
 
-void HttpRequest::SetVersion(const char* begin, const char* end)
+bool HttpRequest::SetVersion(const char* begin, const char* end)
 {
 	std::string version(begin, end);
 
@@ -64,23 +75,30 @@ void HttpRequest::SetVersion(const char* begin, const char* end)
 	{
 		version_ = HTTP_VERSION_11;
 	}
+	else
+	{
+		return false;
+	}
+
+	return true;
 }
 
-void HttpRequest::AddHeader(const char* begin, const char* end)
+bool HttpRequest::AddHeader(const char* begin, const char* end)
 {
 	const char* k_end = std::search(begin, end, KV_SEPARATOR, KV_SEPARATOR + KV_SEPARATOR_LEN);
 
 	if (end - k_end < 3)
 	{
-		return;
+		return false;
 	}
 
 	headers_[{ begin, k_end}] = { k_end + 2, end};
+	return true;
 }
 
 void HttpRequest::AppendBody(const char* begin, const char* end)
 {
-
+	body_.Append(begin, end);
 }
 
 HttpRequest::HttpRequestMethod HttpRequest::GetMethod() const
