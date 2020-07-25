@@ -2,12 +2,14 @@ SET(SRC_FILES
         HttpServer.cpp
         HttpContext.cpp
         HttpRequest.cpp
+        HttpResponse.cpp
 )
 
 SET(HEADER_FILES
         HttpServer.h
         HttpContext.h
         HttpRequest.h
+        HttpResponse.h
 )
 
 add_library(higan_http ${SRC_FILES} ${HEADER_FILES})

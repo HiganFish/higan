@@ -36,6 +36,8 @@ public:
 
 	void SetReusePort();
 
+	ssize_t Send(const char* data, size_t len) const;
+
 private:
 	int fd_;
 

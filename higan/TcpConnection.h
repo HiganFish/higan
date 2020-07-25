@@ -43,9 +43,16 @@ public:
 	int GetFd() const;
 
 	void SetContext(const std::any& context);
+	std::any* GetContext();
+
+	ssize_t Send(char* data, size_t len);
+	ssize_t Send(Buffer* buffer);
+
+
 private:
 	EventLoop* loop_;
 	std::string connection_name_;
+
 
 	Socket socket_;
 
@@ -53,6 +60,8 @@ private:
 
 	Buffer input_buffer_;
 	Buffer output_buffer_;
+
+	bool connecting_;
 
 	MessageCallback message_callback_;
 	TcpConnectionCallback error_callback_;

@@ -37,6 +37,8 @@ public:
 	void Reset();
 
 	HttpRequest& GetRequest();
+
+	bool ParseOver() const;
 private:
 
 	const static char* CRLF;

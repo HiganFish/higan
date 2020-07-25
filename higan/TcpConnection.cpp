@@ -12,7 +12,8 @@ TcpConnection::TcpConnection(EventLoop* loop, const std::string& connection_name
 		loop_(loop),
 		connection_name_(connection_name),
 		socket_(fd, address),
-		channel_(loop_, connection_name, fd)
+		channel_(loop_, connection_name, fd),
+		connecting_(false)
 {
 	channel_.SetReadableCallback(std::bind(&TcpConnection::OnReadable, this));
 	channel_.SetWritableCallback(std::bind(&TcpConnection::OnWritable, this));
@@ -28,6 +29,7 @@ TcpConnection::~TcpConnection()
 void TcpConnection::ConnectionEstablished()
 {
 	channel_.EnableReadable();
+	connecting_ = true;
 
 	if (new_connection_callback_)
 	{
@@ -54,11 +56,23 @@ void TcpConnection::OnReadable()
 
 void TcpConnection::OnWritable()
 {
+	ssize_t send_size = Send(&output_buffer_);
+	if (send_size == -1)
+	{
+		OnError();
+		return;
+	}
+	else if (static_cast<size_t>(send_size) == output_buffer_.ReadableSize())
+	{
+		channel_.DisableWritable();
+	}
 
+	output_buffer_.AddReadIndex(static_cast<size_t>(send_size));
 }
 
 void TcpConnection::OnError()
 {
+	connecting_ = false;
 	channel_.DisableAll();
 	if (error_callback_)
 	{
@@ -94,4 +108,40 @@ void TcpConnection::SetNewConnectionCallback(const TcpConnectionCallback& callba
 void TcpConnection::SetContext(const std::any& context)
 {
 	context_ = context;
+}
+
+std::any* TcpConnection::GetContext()
+{
+	return &context_;
+}
+
+ssize_t TcpConnection::Send(char* data, size_t len)
+{
+	if (!connecting_)
+	{
+		return -1;
+	}
+
+	ssize_t send_size = socket_.Send(data, len);
+
+	if (send_size == -1)
+	{
+		return -1;
+	}
+	else if (send_size < len)
+	{
+		output_buffer_.Append(data + send_size, len - static_cast<size_t>(send_size));
+		channel_.EnableWritable();
+	}
+
+	return send_size;
+}
+
+ssize_t TcpConnection::Send(Buffer* buffer)
+{
+	if (!buffer)
+	{
+		return -1;
+	}
+	return Send(buffer->ReadBegin(), buffer->ReadableSize());
 }

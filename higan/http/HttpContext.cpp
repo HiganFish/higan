@@ -121,3 +121,8 @@ HttpRequest& HttpContext::GetRequest()
 {
 	return request_;
 }
+
+bool HttpContext::ParseOver() const
+{
+	return status_ == PARSE_ALL;
+}

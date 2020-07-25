@@ -15,6 +15,8 @@ namespace higan
 class HttpRequest
 {
 public:
+	typedef std::map<std::string, std::string> HeaderMap;
+
 	enum HttpRequestMethod
 	{
 		HTTP_REQUEST_UNKNOWN,
@@ -59,6 +61,12 @@ public:
 	std::string& GetUrl();
 	HttpVersion GetVersion() const;
 
+	std::string GetMethodString() const;
+
+	const std::string& GetUrl() const;
+
+	const HeaderMap& GetHeaderMap() const;
+
 	/**
 	 * 增加一个 kv对 如 DNT: 1
 	 * @param begin 单条header的首字节指针
@@ -67,6 +75,8 @@ public:
 	bool AddHeader(const char* begin, const char* end);
 
 	void AppendBody(const char* begin, const char* end);
+
+	std::string& operator[](const std::string& key);
 private:
 
 	const static char* KV_SEPARATOR;
@@ -76,7 +86,7 @@ private:
 	std::string url_;
 	HttpVersion version_;
 
-	std::map<std::string, std::string> headers_;
+	HeaderMap headers_;
 
 	Buffer body_;
 };

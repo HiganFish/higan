@@ -10,11 +10,12 @@
 
 #include "higan/utils/noncopyable.h"
 #include "higan/Acceptor.h"
-#include "higan/EventLoop.h"
 #include "higan/TcpConnection.h"
 
 namespace higan
 {
+class EventLoop;
+
 class TcpServer : public noncopyable
 {
 public:

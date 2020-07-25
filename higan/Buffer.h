@@ -45,12 +45,12 @@ public:
 	/**
 	 * @return 可读字节数
 	 */
-	ssize_t ReadableSize() const;
+	size_t ReadableSize() const;
 
 	/**
 	 * @return 可写字节数
 	 */
-	ssize_t WritableSize() const;
+	size_t WritableSize() const;
 
 	void AddReadIndex(size_t index);
 	void AddWriteIndex(size_t index);

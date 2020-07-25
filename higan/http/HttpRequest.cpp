@@ -115,3 +115,43 @@ HttpRequest::HttpVersion HttpRequest::GetVersion() const
 {
 	return version_;
 }
+
+std::string& HttpRequest::operator[](const std::string& key)
+{
+	return headers_[key];
+}
+
+std::string HttpRequest::GetMethodString() const
+{
+	std::string result = "ERROR";
+	switch (method_)
+	{
+	case HTTP_REQUEST_UNKNOWN:
+		result = "UNKNOWN";
+		break;
+	case HTTP_REQUEST_GET:
+		result = "GET";
+		break;
+	case HTTP_REQUEST_POST:
+		result = "POST";
+		break;
+	case HTTP_REQUEST_PUT:
+		result = "PUT";
+		break;
+	case HTTP_REQUEST_DELETE:
+		result = "DELETE";
+		break;
+	}
+
+	return result;
+}
+
+const std::string& HttpRequest::GetUrl() const
+{
+	return url_;
+}
+
+const HttpRequest::HeaderMap& HttpRequest::GetHeaderMap() const
+{
+	return headers_;
+}

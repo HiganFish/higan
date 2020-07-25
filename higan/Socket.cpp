@@ -90,3 +90,12 @@ void Socket::CloseFd(int fd)
 {
 	close(fd);
 }
+
+ssize_t Socket::Send(const char* data, size_t len) const
+{
+	if (data == nullptr)
+	{
+		return -1;
+	}
+	return send(fd_, data, len, 0);
+}

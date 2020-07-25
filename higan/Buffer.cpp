@@ -95,14 +95,14 @@ char* Buffer::WriteBegin()
 	return &buffer_[write_idx_];
 }
 
-ssize_t Buffer::ReadableSize() const
+size_t Buffer::ReadableSize() const
 {
-	return write_idx_ - read_idx_;
+	return static_cast<size_t>(write_idx_ - read_idx_);
 }
 
-ssize_t Buffer::WritableSize() const
+size_t Buffer::WritableSize() const
 {
-	return buffer_.size() - write_idx_;
+	return static_cast<size_t>(buffer_.size() - write_idx_);
 }
 
 void Buffer::AddReadIndex(size_t index)

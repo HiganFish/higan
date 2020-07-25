@@ -4,6 +4,7 @@
 
 #include "higan/TcpServer.h"
 #include "higan/utils/Logger.h"
+#include "higan/EventLoop.h"
 
 using namespace higan;
 
