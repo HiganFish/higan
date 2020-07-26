@@ -60,7 +60,22 @@ public:
 	void Append(const char* begin, const char* end);
 
 	void Append(const char* begin, size_t len);
+
+	void Append(const std::string& data);
+
+	void Append(Buffer* buffer);
+
+	void AppendCRLF();
+
+	/**
+	 * 将Buffer恢复为初始状态 清除所有数据
+	 */
+	void Reset();
 private:
+
+	const static char CRLF[];
+	const static size_t CRLF_LEN;
+
 	std::vector<char> buffer_;
 
 	/**

@@ -18,6 +18,8 @@ void OnHttpRequest(const higan::TcpConnectionPtr& conn, const higan::HttpRequest
 	}
 	std::cout << std::endl;
 
+	response.SetStatusCode(higan::HttpResponse::STATUS_200_OK);
+	response.GetBodyBuffer()->Append(R"({"status": 200, "msg": OK})");
 }
 
 int main()

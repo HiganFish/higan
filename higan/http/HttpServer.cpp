@@ -39,7 +39,12 @@ void HttpServer::OnNewMessage(const TcpConnectionPtr& connection, Buffer& buffer
 
 	if (parsed_size == -1)
 	{
-
+		HttpResponse response(false);
+		response.SetStatusCode(HttpResponse::STATUS_400_BAD_REQUEST);
+		Buffer send_buffer;
+		response.EncodeToBuffer(&send_buffer);
+		connection->Send(&send_buffer);
+		return;
 	}
 	else
 	{
@@ -66,6 +71,10 @@ void HttpServer::ParseOver(const TcpConnectionPtr& connection, HttpRequest& requ
 		on_http_request_(connection, request, response);
 	}
 
+	Buffer send_buffer;
+	response.EncodeToBuffer(&send_buffer);
+
+	connection->Send(&send_buffer);
 }
 
 void HttpServer::SetHttpRequestCallback(const HttpServer::OnHttpRequest& callback)

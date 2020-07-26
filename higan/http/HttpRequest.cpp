@@ -9,7 +9,7 @@
 
 using namespace higan;
 
-const char* HttpRequest::KV_SEPARATOR = ": ";
+const char HttpRequest::KV_SEPARATOR[] = ": ";
 const size_t HttpRequest::KV_SEPARATOR_LEN = strlen(KV_SEPARATOR);
 
 HttpRequest::HttpRequest():

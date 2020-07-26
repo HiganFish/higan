@@ -3,6 +3,7 @@
 //
 
 #include <sys/uio.h>
+#include <cstring>
 
 #include "higan/Buffer.h"
 
@@ -12,6 +13,8 @@ const int Buffer::DEFAULT_BUFFER_SIZE = 4096;
 const int Buffer::DEFAULT_READ_INDEX = 8;
 const int Buffer::DEFAULT_WRITE_INDEX = 8;
 const int Buffer::MAX_EX_BUFFER_SIZE = 65535;
+const char Buffer::CRLF[] = "\r\n";
+const size_t Buffer::CRLF_LEN = strlen(CRLF);
 
 Buffer::Buffer():
 		buffer_(DEFAULT_BUFFER_SIZE),
@@ -156,4 +159,30 @@ void Buffer::Append(const char* begin, size_t len)
 		std::copy(begin, begin + len, WriteBegin());
 		AddWriteIndex(len);
 	}
+}
+
+void Buffer::Append(const std::string& data)
+{
+	Append(data.c_str(), data.size());
+}
+
+void Buffer::AppendCRLF()
+{
+	Append(CRLF, CRLF_LEN);
+}
+
+void Buffer::Append(Buffer* buffer)
+{
+	if (!buffer)
+	{
+		return;
+	}
+	Append(buffer->ReadBegin(), buffer->ReadableSize());
+	buffer->Reset();
+}
+
+void Buffer::Reset()
+{
+	read_idx_ = DEFAULT_READ_INDEX;
+	write_idx_ = DEFAULT_WRITE_INDEX;
 }

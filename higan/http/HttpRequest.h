@@ -17,6 +17,9 @@ class HttpRequest
 public:
 	typedef std::map<std::string, std::string> HeaderMap;
 
+	const static char KV_SEPARATOR[];
+	const static size_t KV_SEPARATOR_LEN;
+
 	enum HttpRequestMethod
 	{
 		HTTP_REQUEST_UNKNOWN,
@@ -78,9 +81,6 @@ public:
 
 	std::string& operator[](const std::string& key);
 private:
-
-	const static char* KV_SEPARATOR;
-	const static size_t KV_SEPARATOR_LEN;
 
 	HttpRequestMethod method_;
 	std::string url_;
