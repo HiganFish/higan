@@ -2,14 +2,19 @@
 // Created by rjd67 on 2020/7/25.
 //
 
-#include "HttpResponse.h"
+#include "higan/http/HttpResponse.h"
+#include "higan/utils/File.h"
 
 using namespace higan;
 
-HttpResponse::HttpResponse(bool keep_connection)
+HttpResponse::HttpResponse(bool keep_connection):
+	body_buffer_(),
+	body_size_(0),
+	file_path_(),
+	has_file_(false)
 {
 	header_map_["Connection"] = keep_connection ? "keep-alive" : "close";
-
+	header_map_["Content-Length"] = "0";
 }
 
 HttpResponse::~HttpResponse()
@@ -34,7 +39,7 @@ void HttpResponse::EncodeToBuffer(Buffer* buffer)
 		return;
 	}
 
-	header_map_["Content-Length"] = std::to_string(body_buffer_.ReadableSize());
+	header_map_["Content-Length"] = std::to_string(body_size_);
 
 	buffer->Append("HTTP/1.1 ", 9);
 	buffer->Append(StatusCodeToString(status_code_));
@@ -51,12 +56,26 @@ void HttpResponse::EncodeToBuffer(Buffer* buffer)
 	}
 
 	buffer->AppendCRLF();
-	buffer->Append(&body_buffer_);
+
+	if (file_path_.empty())
+	{
+		buffer->Append(&body_buffer_);
+	}
 }
 
-void HttpResponse::AppendBody(char* data, size_t len)
+void HttpResponse::AppendBody(const char* data, size_t len)
 {
+	if (has_file_)
+	{
+		return;
+	}
 	body_buffer_.Append(data, len);
+	body_size_ += len;
+}
+
+void HttpResponse::AppendBody(const std::string& body)
+{
+	AppendBody(body.c_str(), body.size());
 }
 
 std::string HttpResponse::StatusCodeToString(HttpResponse::StatusCode status_code)
@@ -87,7 +106,23 @@ bool HttpResponse::GetKeepConnection() const
 	return keep_connection_;
 }
 
-Buffer* HttpResponse::GetBodyBuffer()
+
+void HttpResponse::SetFileToResponse(const std::string& file_path)
 {
-	return &body_buffer_;
+	file_path_ = file_path;
+	has_file_ = true;
+	/**
+	 * TODO 更改文件大小获取方式
+	 */
+	body_size_ = static_cast<int>(File::GetFileSize(file_path_));
+}
+
+bool HttpResponse::HasFileToResponse() const
+{
+	return has_file_;
+}
+
+const std::string& HttpResponse::GetFilePath() const
+{
+	return file_path_;
 }

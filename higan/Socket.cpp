@@ -42,7 +42,7 @@ void Socket::Bind()
 void Socket::SetReuseAddr()
 {
 	int on = 1;
-	int result = setsockopt(fd_, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<void*>(&on),
+	int result = setsockopt(fd_, SOL_SOCKET, SO_REUSEADDR, static_cast<void*>(&on),
 			static_cast<socklen_t>(sizeof on));
 
 	LOG_IF(result == -1, "set socket reuse addr error");
@@ -51,7 +51,7 @@ void Socket::SetReuseAddr()
 void Socket::SetReusePort()
 {
 	int on = 1;
-	int result = setsockopt(fd_, SOL_SOCKET, SO_REUSEPORT, reinterpret_cast<void*>(&on),
+	int result = setsockopt(fd_, SOL_SOCKET, SO_REUSEPORT, static_cast<void*>(&on),
 			static_cast<socklen_t>(sizeof on));
 
 	LOG_IF(result == -1, "set socket reuse port error");

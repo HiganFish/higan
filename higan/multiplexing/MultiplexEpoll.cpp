@@ -63,7 +63,7 @@ void MultiplexEpoll::FillActiveChannelList(int active_event_num, MultiplexBase::
 	for (int i = 0; i < active_event_num; ++i)
 	{
 
-		Channel* channel = reinterpret_cast<Channel*>(epoll_events_[i].data.ptr);
+		Channel* channel = static_cast<Channel*>(epoll_events_[i].data.ptr);
 
 		if (channel == nullptr)
 		{
@@ -87,7 +87,7 @@ bool MultiplexEpoll::UpdateChannelEvent(Channel* channel, int event, int option)
 	struct epoll_event ev{};
 	ev.events = event;
 
-	ev.data.ptr = reinterpret_cast<void*>(channel);
+	ev.data.ptr = static_cast<void*>(channel);
 	ev.events = event;
 
 	bool result = epoll_ctl(epollfd_, option, channel->GetFd(), &ev);

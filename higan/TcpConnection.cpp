@@ -65,6 +65,10 @@ void TcpConnection::OnWritable()
 	else if (static_cast<size_t>(send_size) == output_buffer_.ReadableSize())
 	{
 		channel_.DisableWritable();
+		if (write_over_callback_)
+		{
+			write_over_callback_(shared_from_this());
+		}
 	}
 
 	output_buffer_.AddReadIndex(static_cast<size_t>(send_size));
@@ -105,14 +109,9 @@ void TcpConnection::SetNewConnectionCallback(const TcpConnectionCallback& callba
 	new_connection_callback_ = callback;
 }
 
-void TcpConnection::SetContext(const std::any& context)
+void TcpConnection::SetContext(const std::string& context_key, const std::any& context)
 {
-	context_ = context;
-}
-
-std::any* TcpConnection::GetContext()
-{
-	return &context_;
+	context_map_[context_key] = context;
 }
 
 ssize_t TcpConnection::Send(char* data, size_t len)
@@ -144,4 +143,30 @@ ssize_t TcpConnection::Send(Buffer* buffer)
 		return -1;
 	}
 	return Send(buffer->ReadBegin(), buffer->ReadableSize());
+}
+
+
+void TcpConnection::SetWriteOverCallback(const TcpConnectionCallback& callback)
+{
+	write_over_callback_ = callback;
+}
+
+bool TcpConnection::GetContext(const std::string& context_key, std::any** context)
+{
+	auto result = context_map_.find(context_key);
+
+	if (result == context_map_.end())
+	{
+		context = nullptr;
+		return false;
+	}
+
+	*context = &result->second;
+
+	return true;
+}
+
+void TcpConnection::DeleteContext(const std::string& context_key)
+{
+	context_map_.erase(context_key);
 }

@@ -8,10 +8,10 @@
 #include <string>
 
 #include "higan/http/HttpRequest.h"
-#include "higan/Buffer.h"
 
 namespace higan
 {
+
 class HttpResponse
 {
 public:
@@ -42,13 +42,16 @@ public:
 	 */
 	void EncodeToBuffer(Buffer* buffer);
 
-	void AppendBody(char* data, size_t len);
-
-	Buffer* GetBodyBuffer();
+	void AppendBody(const std::string& body);
+	void AppendBody(const char* data, size_t len);
 
 	static std::string StatusCodeToString(StatusCode status_code);
 
 	bool GetKeepConnection() const;
+
+	void SetFileToResponse(const std::string& file_path);
+	bool HasFileToResponse() const;
+	const std::string& GetFilePath() const;
 
 private:
 
@@ -59,6 +62,10 @@ private:
 	HttpRequest::HeaderMap header_map_;
 
 	Buffer body_buffer_;
+	int body_size_;
+
+	std::string file_path_;
+	bool has_file_;
 };
 }
 

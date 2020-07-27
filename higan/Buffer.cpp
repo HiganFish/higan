@@ -17,14 +17,22 @@ const char Buffer::CRLF[] = "\r\n";
 const size_t Buffer::CRLF_LEN = strlen(CRLF);
 
 Buffer::Buffer():
-		buffer_(DEFAULT_BUFFER_SIZE),
-		read_idx_(DEFAULT_READ_INDEX),
-		write_idx_(DEFAULT_WRITE_INDEX)
+		Buffer(DEFAULT_BUFFER_SIZE)
 {
 
 }
 
 Buffer::~Buffer()
+{
+
+}
+
+
+Buffer::Buffer(int buffer_size):
+		buffer_(buffer_size),
+		read_idx_(DEFAULT_READ_INDEX),
+		write_idx_(DEFAULT_WRITE_INDEX)
+
 {
 
 }

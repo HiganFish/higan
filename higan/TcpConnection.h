@@ -8,6 +8,7 @@
 #include <string>
 #include <memory>
 #include <any>
+#include <map>
 
 #include "higan/Channel.h"
 #include "higan/Socket.h"
@@ -37,13 +38,27 @@ public:
 	void SetNewConnectionCallback(const TcpConnectionCallback& callback);
 	void SetMessageCallback(const MessageCallback& callback);
 	void SetErrorCallback(const TcpConnectionCallback& callback);
+	void SetWriteOverCallback(const TcpConnectionCallback& callback);
 
 	const std::string& GetConnectionName() const;
 
 	int GetFd() const;
 
-	void SetContext(const std::any& context);
-	std::any* GetContext();
+	/**
+	 * 设置Tcp连接的上下文内容
+	 * @param context_key 上下文内容key 用途获取设置的上下文
+	 * @param context 需要保存的上下文
+	 */
+	void SetContext(const std::string& context_key, const std::any& context);
+	void DeleteContext(const std::string& context_key);
+
+	/**
+	 * 获取此Tcp连接的上下文
+	 * @param context_key 上下文key
+	 * @param context 上下文结果返回
+	 * @return true 存在此key对应的上下文 false不存在对应的上下文
+	 */
+	bool GetContext(const std::string& context_key, std::any** context);
 
 	ssize_t Send(char* data, size_t len);
 	ssize_t Send(Buffer* buffer);
@@ -66,11 +81,17 @@ private:
 	MessageCallback message_callback_;
 	TcpConnectionCallback error_callback_;
 	TcpConnectionCallback new_connection_callback_;
+	TcpConnectionCallback write_over_callback_;
 
-	std::any context_;
+	std::map<std::string, std::any>  context_map_;
 
 	void OnReadable();
 
+	/**
+	 * 如果output_buffer_存在未发送完毕的内容 则继续发送
+	 * 发送完毕后取消可写事件回调
+	 * 如果 注册了写完回调函数 则调用write_over_callback_
+	 */
 	void OnWritable();
 
 	void OnError();

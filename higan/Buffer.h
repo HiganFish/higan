@@ -21,6 +21,7 @@ public:
 	static const int MAX_EX_BUFFER_SIZE;
 
 	Buffer();
+	explicit Buffer(int buffer_size);
 	~Buffer();
 
 	/**
