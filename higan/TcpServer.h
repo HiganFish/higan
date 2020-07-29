@@ -33,6 +33,8 @@ public:
 	void SetMessageCallback(const MessageCallback& callback);
 	void SetMewConnectionCallback(const TcpConnectionCallback& callback);
 
+	bool CloseAllConnection();
+
 private:
 
 	typedef std::map<int, TcpConnectionPtr> TcpConnectionMap;

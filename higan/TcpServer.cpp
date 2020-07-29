@@ -52,7 +52,6 @@ void TcpServer::OnConnectionError(const TcpConnectionPtr& connection_ptr)
 void TcpServer::RemoveConnection(const TcpConnectionPtr& connection_ptr)
 {
 	std::string connection_name = connection_ptr->GetConnectionName();
-	LOG("connection %s closed", connection_name.c_str());
 
 	connection_map_.erase(connection_ptr->GetFd());
 }
@@ -66,5 +65,13 @@ void TcpServer::SetMessageCallback(const MessageCallback & callback)
 void TcpServer::SetMewConnectionCallback(const TcpConnectionCallback& callback)
 {
 	newconnection_callback_ = callback;
+}
+
+bool TcpServer::CloseAllConnection()
+{
+	bool result = !connection_map_.empty();
+	connection_map_.clear();
+
+	return result;
 }
 

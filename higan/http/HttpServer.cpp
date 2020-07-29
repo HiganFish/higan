@@ -85,7 +85,7 @@ void HttpServer::ParseOver(const TcpConnectionPtr& connection, HttpRequest& requ
 	if (response.HasFileToResponse())
 	{
 		FileCache::FilePtr file_ptr = file_cache_.GetFile(response.GetFilePath());
-		SendFile(connection, file_ptr);
+		SendFile(connection, file_ptr, true);
 	}
 
 
@@ -103,7 +103,7 @@ void HttpServer::SetHttpRequestCallback(const HttpServer::OnHttpRequest& callbac
 	on_http_request_ = callback;
 }
 
-void HttpServer::SendFile(const TcpConnectionPtr& connection, const FileCache::FilePtr& file_ptr)
+void HttpServer::SendFile(const TcpConnectionPtr& connection, const FileCache::FilePtr& file_ptr, bool first_send)
 {
 	ssize_t read_size = -1;
 	ssize_t send_size = -1;
@@ -123,15 +123,20 @@ void HttpServer::SendFile(const TcpConnectionPtr& connection, const FileCache::F
 		}
 
 		send_size = connection->Send(&send_buffer);
+		send_buffer.AddReadIndex(send_size);
+
 		if (send_size == -1)
 		{
 			LOG_IF(true, "send file error");
-			return;
+			break;
 		}
 		else if (send_size < read_size)
 		{
-			connection->SetContext("HttpFile", std::any(file_ptr));
-			break;
+			if (first_send)
+			{
+				connection->SetContext("HttpFile", std::any(file_ptr));
+			}
+			return;
 		}
 	}
 
@@ -151,5 +156,10 @@ void HttpServer::OnMessageSendOver(const TcpConnectionPtr& connection)
 	}
 
 	FileCache::FilePtr* file_ptr = std::any_cast<FileCache::FilePtr>(context_file);
-	SendFile(connection, *file_ptr);
+	SendFile(connection, *file_ptr, false);
+}
+
+bool HttpServer::CloseAllConnection()
+{
+	return server_.CloseAllConnection();
 }

@@ -11,9 +11,9 @@ Acceptor::Acceptor(EventLoop* loop, const InetAddress& address):
 		listening_socket_(address),
 		channel_(loop_, "acceptor", listening_socket_.GetFd())
 {
-	listening_socket_.Bind();
 	listening_socket_.SetReuseAddr();
 	listening_socket_.SetReusePort();
+	listening_socket_.Bind();
 
 	channel_.EnableReadable();
 

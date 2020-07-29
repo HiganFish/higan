@@ -6,6 +6,7 @@
 #include <algorithm>
 
 #include "higan/http/HttpRequest.h"
+#include "higan/utils/Codec.h"
 
 using namespace higan;
 
@@ -58,7 +59,7 @@ bool HttpRequest::SetUrl(const char* begin, const char* end)
 	{
 		return false;
 	}
-	url_.append(begin, end);
+	url_ = Codec::DecodeUrl(begin, end - begin);
 
 	return true;
 }

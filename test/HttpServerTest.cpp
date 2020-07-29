@@ -5,6 +5,8 @@
 
 #include <higan/http/HttpServer.h>
 #include <higan/EventLoop.h>
+#include <higan/utils/Codec.h>
+#include <csignal>
 
 std::string web_root = "/usr/local/web/blog";
 
@@ -15,6 +17,12 @@ void OnHttpRequest(const higan::TcpConnectionPtr& conn, const higan::HttpRequest
 	std::cout << request.GetMethodString() << " " << request.GetUrl() << std::endl;
 
 	std::string file_path = web_root + request.GetUrl();
+
+	for (const auto& kv : request.GetHeaderMap())
+	{
+		std::cout << kv.first << ": " << kv.second << std::endl;
+	}
+	std::cout << std::endl;
 
 	struct stat file_status;
 
@@ -41,13 +49,29 @@ void OnHttpRequest(const higan::TcpConnectionPtr& conn, const higan::HttpRequest
 	response.SetFileToResponse(file_path);
 }
 
+higan::HttpServer* g_httpserver;
+
+void CloseAllConnection(int signal)
+{
+	if (signal == SIGINT)
+	{
+		g_httpserver->CloseAllConnection();
+		exit(signal);
+	}
+}
+
 int main()
 {
 
-	higan::InetAddress address(1020);
+	signal(SIGPIPE, SIG_IGN);
+	signal(SIGINT, CloseAllConnection);
+
+	higan::InetAddress address(1022);
 	higan::EventLoop loop;
 
 	higan::HttpServer server(&loop, address, "HttpServerTest");
+	g_httpserver = &server;
+
 	server.SetHttpRequestCallback(OnHttpRequest);
 
 	server.Start();

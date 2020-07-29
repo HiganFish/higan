@@ -13,4 +13,8 @@ target_link_libraries(HttpContextTest higan_http)
 add_executable(HttpServerTest HttpServerTest.cpp)
 target_link_libraries(HttpServerTest higan_http)
 
+
+add_executable(CodecTest utils/CodecTest.cpp)
+target_link_libraries(CodecTest higan_http)
+
 include_directories(${CMAKE_SOURCE_DIR})

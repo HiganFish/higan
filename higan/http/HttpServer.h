@@ -26,6 +26,8 @@ public:
 
 	void SetHttpRequestCallback(const OnHttpRequest& callback);
 
+	bool CloseAllConnection();
+
 private:
 
 	TcpServer server_;
@@ -42,7 +44,7 @@ private:
 
 	void ParseOver(const TcpConnectionPtr& connection, HttpRequest& request);
 
-	void SendFile(const TcpConnectionPtr& connection, const FileCache::FilePtr& file_ptr);
+	void SendFile(const TcpConnectionPtr& connection, const FileCache::FilePtr& file_ptr, bool first_send);
 };
 }
 

@@ -114,7 +114,7 @@ void HttpResponse::SetFileToResponse(const std::string& file_path)
 	/**
 	 * TODO 更改文件大小获取方式
 	 */
-	body_size_ = static_cast<int>(File::GetFileSize(file_path_));
+	body_size_ = static_cast<size_t>(File::GetFileSize(file_path_));
 }
 
 bool HttpResponse::HasFileToResponse() const

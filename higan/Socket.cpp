@@ -22,7 +22,7 @@ Socket::Socket(int fd, const InetAddress& address):
 		fd_(fd),
 		address_(address)
 {
-
+	SetKeepALive();
 }
 
 Socket::~Socket()
@@ -52,6 +52,15 @@ void Socket::SetReusePort()
 {
 	int on = 1;
 	int result = setsockopt(fd_, SOL_SOCKET, SO_REUSEPORT, static_cast<void*>(&on),
+			static_cast<socklen_t>(sizeof on));
+
+	LOG_IF(result == -1, "set socket reuse port error");
+}
+
+void Socket::SetKeepALive()
+{
+	int on = 1;
+	int result = setsockopt(fd_, SOL_SOCKET, SO_KEEPALIVE, static_cast<void*>(&on),
 			static_cast<socklen_t>(sizeof on));
 
 	LOG_IF(result == -1, "set socket reuse port error");

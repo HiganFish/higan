@@ -24,6 +24,11 @@ TcpConnection::TcpConnection(EventLoop* loop, const std::string& connection_name
 TcpConnection::~TcpConnection()
 {
 	channel_.DisableAll();
+
+	if (connecting_)
+	{
+		LOG("connection: %s closed by destructor", connection_name_.c_str());
+	}
 }
 
 void TcpConnection::ConnectionEstablished()

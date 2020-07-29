@@ -62,7 +62,7 @@ private:
 	HttpRequest::HeaderMap header_map_;
 
 	Buffer body_buffer_;
-	int body_size_;
+	size_t body_size_;
 
 	std::string file_path_;
 	bool has_file_;

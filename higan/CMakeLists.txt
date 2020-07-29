@@ -13,6 +13,7 @@ SET(SRCS_FILES
         TcpConnection.cpp
         Buffer.cpp
         utils/System.cpp
+        utils/Codec.cpp
 )
 
 SET(HEADERS_FILES
@@ -33,6 +34,7 @@ SET(HEADERS_FILES
         Buffer.h
         utils/System.h
         Callback.h
+        utils/Codec.h
 )
 
 add_library(higan_net ${SRCS_FILES} ${HEADERS_FILES})
