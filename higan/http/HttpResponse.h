@@ -47,7 +47,7 @@ public:
 
 	static std::string StatusCodeToString(StatusCode status_code);
 
-	bool GetKeepConnection() const;
+	bool IsKeepConnection() const;
 
 	void SetFileToResponse(const std::string& file_path);
 	bool HasFileToResponse() const;

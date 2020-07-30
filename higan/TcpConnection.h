@@ -63,6 +63,11 @@ public:
 	ssize_t Send(char* data, size_t len);
 	ssize_t Send(Buffer* buffer);
 
+	void CloseConnection();
+
+	bool IsCallSendOverCallback() const;
+
+	void SetCallSendOverCallback(bool callSendOverCallback);
 
 private:
 	EventLoop* loop_;
@@ -77,6 +82,7 @@ private:
 	Buffer output_buffer_;
 
 	bool connecting_;
+	bool call_send_over_callback_;
 
 	MessageCallback message_callback_;
 	TcpConnectionCallback error_callback_;

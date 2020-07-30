@@ -13,7 +13,8 @@ TcpConnection::TcpConnection(EventLoop* loop, const std::string& connection_name
 		connection_name_(connection_name),
 		socket_(fd, address),
 		channel_(loop_, connection_name, fd),
-		connecting_(false)
+		connecting_(false),
+		call_send_over_callback_(false)
 {
 	channel_.SetReadableCallback(std::bind(&TcpConnection::OnReadable, this));
 	channel_.SetWritableCallback(std::bind(&TcpConnection::OnWritable, this));
@@ -70,9 +71,12 @@ void TcpConnection::OnWritable()
 	else if (static_cast<size_t>(send_size) == output_buffer_.ReadableSize())
 	{
 		channel_.DisableWritable();
-		if (write_over_callback_)
+		if (call_send_over_callback_)
 		{
-			write_over_callback_(shared_from_this());
+			if (write_over_callback_)
+			{
+				write_over_callback_(shared_from_this());
+			}
 		}
 	}
 
@@ -174,4 +178,19 @@ bool TcpConnection::GetContext(const std::string& context_key, std::any** contex
 void TcpConnection::DeleteContext(const std::string& context_key)
 {
 	context_map_.erase(context_key);
+}
+
+void TcpConnection::CloseConnection()
+{
+	OnError();
+}
+
+bool TcpConnection::IsCallSendOverCallback() const
+{
+	return call_send_over_callback_;
+}
+
+void TcpConnection::SetCallSendOverCallback(bool callSendOverCallback)
+{
+	call_send_over_callback_ = callSendOverCallback;
 }

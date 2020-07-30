@@ -13,7 +13,7 @@ HttpResponse::HttpResponse(bool keep_connection):
 	file_path_(),
 	has_file_(false)
 {
-	header_map_["Connection"] = keep_connection ? "keep-alive" : "close";
+	header_map_["Connection"] = keep_connection ? "Keep-Alive" : "close";
 	header_map_["Content-Length"] = "0";
 }
 
@@ -101,7 +101,7 @@ std::string HttpResponse::StatusCodeToString(HttpResponse::StatusCode status_cod
 }
 
 
-bool HttpResponse::GetKeepConnection() const
+bool HttpResponse::IsKeepConnection() const
 {
 	return keep_connection_;
 }

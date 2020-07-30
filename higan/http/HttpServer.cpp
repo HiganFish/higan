@@ -9,8 +9,7 @@
 using namespace higan;
 
 HttpServer::HttpServer(EventLoop* loop, const InetAddress& addr, const std::string& server_name):
-		server_(loop, addr, server_name),
-		file_cache_()
+		server_(loop, addr, server_name)
 {
 	server_.SetMewConnectionCallback(std::bind(&HttpServer::OnNewConnection, this, _1));
 	server_.SetMessageCallback(std::bind(&HttpServer::OnNewMessage, this, _1, _2));
@@ -69,7 +68,7 @@ void HttpServer::OnNewMessage(const TcpConnectionPtr& connection, Buffer& buffer
 void HttpServer::ParseOver(const TcpConnectionPtr& connection, HttpRequest& request)
 {
 	bool keep_connection = request.GetVersion()==HttpRequest::HTTP_VERSION_11 ?
-						   request["Connection"]=="keep-alive" : false;
+						   request["Connection"]=="Keep-Alive" : false;
 
 	HttpResponse response(keep_connection);
 
@@ -82,20 +81,24 @@ void HttpServer::ParseOver(const TcpConnectionPtr& connection, HttpRequest& requ
 	response.EncodeToBuffer(&send_buffer);
 	connection->Send(&send_buffer);
 
+
 	if (response.HasFileToResponse())
 	{
-		FileCache::FilePtr file_ptr = file_cache_.GetFile(response.GetFilePath());
-		SendFile(connection, file_ptr, true);
+		if (SendFile(connection, response.GetFilePath(), keep_connection))
+		{
+			if (!keep_connection)
+			{
+				connection->CloseConnection();
+			}
+		}
 	}
-
-
-	/**
-	 * 如果有文件需要发送
-	 * 注册文件上下文
-	 * 持续调用Send函数发送直到
-	 *  - 无法发送但文件未发送完, TcpConnection注册了写完回调 待发送完已经Send的内容后 调用写完回调继续写
-	 *  - 文件发送完 xxxxx
-	 */
+	else
+	{
+		if (!keep_connection)
+		{
+			connection->CloseConnection();
+		}
+	}
 }
 
 void HttpServer::SetHttpRequestCallback(const HttpServer::OnHttpRequest& callback)
@@ -103,10 +106,11 @@ void HttpServer::SetHttpRequestCallback(const HttpServer::OnHttpRequest& callbac
 	on_http_request_ = callback;
 }
 
-void HttpServer::SendFile(const TcpConnectionPtr& connection, const FileCache::FilePtr& file_ptr, bool first_send)
+ssize_t HttpServer::SendFileInternal(const TcpConnectionPtr& connection, const FileContext::FileContextPtr& file_ptr)
 {
 	ssize_t read_size = -1;
 	ssize_t send_size = -1;
+	ssize_t sum_send_size = 0;
 	Buffer send_buffer;
 
 	while (true)
@@ -115,32 +119,29 @@ void HttpServer::SendFile(const TcpConnectionPtr& connection, const FileCache::F
 		if (read_size == -1)
 		{
 			LOG_IF(true, "read file error");
-			return;
+			return -1;
 		}
 		else if(read_size == 0)
 		{
-			break;
+			return 0;
 		}
 
 		send_size = connection->Send(&send_buffer);
 		send_buffer.AddReadIndex(send_size);
+		sum_send_size += send_size;
 
 		if (send_size == -1)
 		{
 			LOG_IF(true, "send file error");
-			break;
+			return -1;
 		}
 		else if (send_size < read_size)
 		{
-			if (first_send)
-			{
-				connection->SetContext("HttpFile", std::any(file_ptr));
-			}
-			return;
+			return sum_send_size;
 		}
 	}
 
-	connection->DeleteContext("HttpFile");
+	return -1;
 }
 
 void HttpServer::OnMessageSendOver(const TcpConnectionPtr& connection)
@@ -149,17 +150,55 @@ void HttpServer::OnMessageSendOver(const TcpConnectionPtr& connection)
 	 * 如果存在相关上下文 说明文件未发送完毕 继续发送
 	 */
 	std::any* context_file = nullptr;
-	bool has_file = connection->GetContext("HttpFile", &context_file);
-	if (!has_file)
-	{
-		return;
-	}
+	connection->GetContext("HttpFileContext", &context_file);
 
-	FileCache::FilePtr* file_ptr = std::any_cast<FileCache::FilePtr>(context_file);
-	SendFile(connection, *file_ptr, false);
+	FileContext::FileContextPtr file_ptr = *std::any_cast<FileContext::FileContextPtr>(context_file);
+
+	ssize_t send_size = SendFileInternal(connection, file_ptr) > 0;
+
+	if (send_size > 0)
+	{
+		connection->SetCallSendOverCallback(true);
+	}
+	else if (send_size == 0)
+	{
+		connection->SetCallSendOverCallback(false);
+		connection->DeleteContext("HttpFileContext");
+
+		if (!file_ptr->IsKeepConnection())
+		{
+			connection->CloseConnection();
+		}
+	}
+	else
+	{
+		connection->CloseConnection();
+	}
 }
 
 bool HttpServer::CloseAllConnection()
 {
 	return server_.CloseAllConnection();
+}
+
+bool HttpServer::SendFile(const TcpConnectionPtr& connection, const std::string& file_url, bool keep_connection)
+{
+	FileContext::FileContextPtr file_context_ptr = std::make_shared<FileContext>(file_url,
+			keep_connection);
+	ssize_t send_result = SendFileInternal(connection, file_context_ptr);
+	if (send_result > 0)
+	{
+		connection->SetContext("HttpFileContext", std::any(file_context_ptr));
+		connection->SetCallSendOverCallback(true);
+
+		return false;
+	}
+	else if (send_result == 0)
+	{
+		connection->SetCallSendOverCallback(false);
+
+		return true;
+	}
+
+	return true;
 }
