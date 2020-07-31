@@ -24,29 +24,34 @@ void OnHttpRequest(const higan::TcpConnectionPtr& conn, const higan::HttpRequest
 	}
 	std::cout << std::endl;
 
-	struct stat file_status;
-
-	if (stat(file_path.c_str(), &file_status) == -1)
-	{
-		response.SetStatusCode(higan::HttpResponse::STATUS_404_NOT_FOUND);
-		response.AppendBody("file don't exist");
-		return;
-	}
-
-	if (S_ISDIR(file_status.st_mode))
-	{
-		file_path += "/index.html";
-
-		if (stat(file_path.c_str(), &file_status) == -1)
-		{
-			response.SetStatusCode(higan::HttpResponse::STATUS_404_NOT_FOUND);
-			response.AppendBody("file don't exist");
-			return;
-		}
-	}
+	response["Server"] = "higan";
 
 	response.SetStatusCode(higan::HttpResponse::STATUS_200_OK);
-	response.SetFileToResponse(file_path);
+	response.AppendBody("hello, world!\n");
+
+//	struct stat file_status;
+//
+//	if (stat(file_path.c_str(), &file_status) == -1)
+//	{
+//		response.SetStatusCode(higan::HttpResponse::STATUS_404_NOT_FOUND);
+//		response.AppendBody("file don't exist");
+//		return;
+//	}
+//
+//	if (S_ISDIR(file_status.st_mode))
+//	{
+//		file_path += "/index.html";
+//
+//		if (stat(file_path.c_str(), &file_status) == -1)
+//		{
+//			response.SetStatusCode(higan::HttpResponse::STATUS_404_NOT_FOUND);
+//			response.AppendBody("file don't exist");
+//			return;
+//		}
+//	}
+//
+//	response.SetStatusCode(higan::HttpResponse::STATUS_200_OK);
+//	response.SetFileToResponse(file_path);
 }
 
 higan::HttpServer* g_httpserver;

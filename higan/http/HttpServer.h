@@ -15,8 +15,11 @@ namespace higan
 class HttpServer
 {
 public:
+	/**
+	 * 按照自己的编程规范 response应该声明为指针 可是这样会导致重载的 [] 运算符使用不便 所以选择了引用
+	 */
 	typedef  std::function<void(const TcpConnectionPtr& connection, const HttpRequest& request,
-			HttpResponse& response)> OnHttpRequest;
+			HttpResponse& response)> HttpCallback;
 
 
 	HttpServer(EventLoop* loop, const InetAddress& addr, const std::string& server_name);
@@ -24,7 +27,7 @@ public:
 
 	void Start();
 
-	void SetHttpRequestCallback(const OnHttpRequest& callback);
+	void SetHttpRequestCallback(const HttpCallback& callback);
 
 	bool CloseAllConnection();
 
@@ -32,7 +35,7 @@ private:
 
 	TcpServer server_;
 
-	OnHttpRequest on_http_request_;
+	HttpCallback on_http_request_;
 
 	void OnNewConnection(const TcpConnectionPtr& connection);
 
@@ -40,7 +43,7 @@ private:
 
 	void OnMessageSendOver(const TcpConnectionPtr& connection);
 
-	void ParseOver(const TcpConnectionPtr& connection, HttpRequest& request);
+	void OnHttpRequest(const TcpConnectionPtr& connection, HttpRequest& request);
 
 	/**
 	 * 发送文件到指定连接

@@ -25,37 +25,43 @@ HttpContext::~HttpContext()
 
 }
 
-ssize_t HttpContext::ParseRequest(const char* begin, size_t len)
+bool HttpContext::ParseRequest(Buffer* buffer)
 {
-	size_t parsed_len = 0;
+	bool result_ok = true;
 
-	if (status_ == PARSE_FIRST_LINE)
+	while (true)
 	{
-		ssize_t p_len = ParseFirstLine(begin, begin + len);
-		if (p_len == -1)
+		const char* data = buffer->ReadBegin();
+		size_t len = buffer->ReadableSize();
+
+		if (status_ == PARSE_FIRST_LINE)
 		{
-			return -1;
+			ssize_t p_len = ParseFirstLine(data, data + len);
+			if (p_len == -1)
+			{
+				result_ok = false;
+				break;
+			}
+			buffer->AddReadIndex(p_len);
 		}
-		parsed_len += p_len;
-	}
-
-	if (status_ == PARSE_HEADERS)
-	{
-		ssize_t p_len = ParseHeader(begin + parsed_len, begin + len);
-		if (p_len == -1)
+		else if (status_ == PARSE_HEADERS)
 		{
-			return -1;
+			ssize_t p_len = ParseHeader(data, data + len);
+			if (p_len == -1)
+			{
+				result_ok = false;
+				break;;
+			}
+			buffer->AddReadIndex(p_len);
 		}
-		parsed_len += p_len;
+		else if (status_ == PARSE_ALL)
+		{
+			request_.AppendBody(data, data + len);
+			buffer->Reset();
+			break;
+		}
 	}
-
-	if (status_ == PARSE_ALL)
-	{
-		request_.AppendBody(begin + parsed_len, begin + len);
-		return len;
-	}
-
-	return parsed_len;
+	return result_ok;
 }
 
 ssize_t HttpContext::ParseFirstLine(const char* begin, const char* end)

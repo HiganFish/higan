@@ -24,7 +24,7 @@ public:
 		STATUS_500_SERVICE_ERROR = 500
 	};
 
-	explicit HttpResponse(bool keep_connection);
+	explicit HttpResponse(bool close_connection);
 	~HttpResponse();
 
 	void SetStatusCode(StatusCode status_code);
@@ -47,7 +47,7 @@ public:
 
 	static std::string StatusCodeToString(StatusCode status_code);
 
-	bool IsKeepConnection() const;
+	bool CloseConnection() const;
 
 	void SetFileToResponse(const std::string& file_path);
 	bool HasFileToResponse() const;
@@ -55,7 +55,7 @@ public:
 
 private:
 
-	bool keep_connection_;
+	bool close_connection_;
 
 	StatusCode status_code_;
 

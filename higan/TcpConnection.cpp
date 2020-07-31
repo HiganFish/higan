@@ -123,7 +123,7 @@ void TcpConnection::SetContext(const std::string& context_key, const std::any& c
 	context_map_[context_key] = context;
 }
 
-ssize_t TcpConnection::Send(char* data, size_t len)
+ssize_t TcpConnection::Send(const char* data, size_t len)
 {
 	if (!connecting_)
 	{
@@ -152,6 +152,11 @@ ssize_t TcpConnection::Send(Buffer* buffer)
 		return -1;
 	}
 	return Send(buffer->ReadBegin(), buffer->ReadableSize());
+}
+
+ssize_t TcpConnection::Send(const std::string& data)
+{
+	return Send(data.c_str(), data.length());
 }
 
 

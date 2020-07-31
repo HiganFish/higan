@@ -33,44 +33,39 @@ void HttpServer::OnNewConnection(const TcpConnectionPtr& connection)
 
 void HttpServer::OnNewMessage(const TcpConnectionPtr& connection, Buffer& buffer)
 {
-	const char* data = buffer.ReadBegin();
-	size_t size = buffer.ReadableSize();
-
 	std::any* context_any = nullptr;
 	connection->GetContext("HttpContext", &context_any);
 	HttpContext* context = std::any_cast<HttpContext>(context_any);
 
-	ssize_t parsed_size = context->ParseRequest(data, size);
+	bool parse_ok = context->ParseRequest(&buffer);
 
-	if (parsed_size == -1)
+	if (!parse_ok)
 	{
-		HttpResponse response(false);
-		response.SetStatusCode(HttpResponse::STATUS_400_BAD_REQUEST);
-		Buffer send_buffer;
-		response.EncodeToBuffer(&send_buffer);
-		connection->Send(&send_buffer);
-		return;
-	}
-	else
-	{
-		buffer.AddReadIndex(static_cast<size_t>(parsed_size));
+		/**
+		 * 解析失败直接简单粗暴返回错误 .... 可以可以 不分配多余的资源
+		 */
+		connection->Send("HTTP/1.1 400 Bad Request\r\n\r\n");
+		connection->CloseConnection();
 	}
 
-	if (!context->ParseOver())
+	if (context->ParseOver())
 	{
-		return;
+		OnHttpRequest(connection, context->GetRequest());
+		context->Reset();
 	}
-
-	ParseOver(connection, context->GetRequest());
-	context->Reset();
 }
 
-void HttpServer::ParseOver(const TcpConnectionPtr& connection, HttpRequest& request)
+void HttpServer::OnHttpRequest(const TcpConnectionPtr& connection, HttpRequest& request)
 {
-	bool keep_connection = request.GetVersion()==HttpRequest::HTTP_VERSION_11 ?
-						   request["Connection"]=="Keep-Alive" : false;
+	std::string& connection_flag = request["Connection"];
 
-	HttpResponse response(keep_connection);
+	// 原本的 keep_connection逻辑写起来有点麻烦 换为了跟muduo一样的判断 close
+	// 而且只有当连接为close的时候才需要进行特殊操作
+	bool close_connection = connection_flag == "close" ||
+			(request.GetVersion() == HttpRequest::HTTP_VERSION_10
+			&& connection_flag != "Keep-Alive");
+
+	HttpResponse response(close_connection);
 
 	if (on_http_request_)
 	{
@@ -81,12 +76,11 @@ void HttpServer::ParseOver(const TcpConnectionPtr& connection, HttpRequest& requ
 	response.EncodeToBuffer(&send_buffer);
 	connection->Send(&send_buffer);
 
-
 	if (response.HasFileToResponse())
 	{
-		if (SendFile(connection, response.GetFilePath(), keep_connection))
+		if (SendFile(connection, response.GetFilePath(), close_connection))
 		{
-			if (!keep_connection)
+			if (close_connection)
 			{
 				connection->CloseConnection();
 			}
@@ -94,14 +88,14 @@ void HttpServer::ParseOver(const TcpConnectionPtr& connection, HttpRequest& requ
 	}
 	else
 	{
-		if (!keep_connection)
+		if (close_connection)
 		{
 			connection->CloseConnection();
 		}
 	}
 }
 
-void HttpServer::SetHttpRequestCallback(const HttpServer::OnHttpRequest& callback)
+void HttpServer::SetHttpRequestCallback(const HttpServer::HttpCallback& callback)
 {
 	on_http_request_ = callback;
 }
@@ -165,7 +159,7 @@ void HttpServer::OnMessageSendOver(const TcpConnectionPtr& connection)
 		connection->SetCallSendOverCallback(false);
 		connection->DeleteContext("HttpFileContext");
 
-		if (!file_ptr->IsKeepConnection())
+		if (file_ptr->CloseConnection())
 		{
 			connection->CloseConnection();
 		}

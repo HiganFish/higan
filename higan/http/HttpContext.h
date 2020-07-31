@@ -25,11 +25,10 @@ public:
 
 	/**
 	 * 解析请求
-	 * @param begin 首字节指针
-	 * @param len 长度
-	 * @return 正数为已解析长度 -1代表出错
+	 * @param buffer
+	 * @return false error
 	 */
-	ssize_t ParseRequest(const char* begin, size_t len);
+	bool ParseRequest(Buffer* buffer);
 
 	/**
 	 * 重置已解析的request 将解析状态置为解析首行

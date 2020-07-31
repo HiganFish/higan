@@ -15,17 +15,17 @@ class FileContext
 public:
 	typedef std::shared_ptr<FileContext> FileContextPtr;
 
-	FileContext(const std::string& url, bool keep_connection);
+	FileContext(const std::string& url, bool close_connection);
 	~FileContext();
 
 	ssize_t ReadFileToBuffer(Buffer* buffer);
 
-	bool IsKeepConnection() const;
+	bool CloseConnection() const;
 
 private:
 	std::string url_;
 
-	bool keep_connection_;
+	bool close_connection_;
 
 	File file_;
 };

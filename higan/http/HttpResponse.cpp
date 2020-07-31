@@ -7,13 +7,14 @@
 
 using namespace higan;
 
-HttpResponse::HttpResponse(bool keep_connection):
+HttpResponse::HttpResponse(bool close_connection):
 	body_buffer_(),
 	body_size_(0),
 	file_path_(),
-	has_file_(false)
+	has_file_(false),
+	close_connection_(close_connection)
 {
-	header_map_["Connection"] = keep_connection ? "Keep-Alive" : "close";
+	header_map_["Connection"] = close_connection ? "close" : "Keep-Alive";
 	header_map_["Content-Length"] = "0";
 }
 
@@ -41,7 +42,7 @@ void HttpResponse::EncodeToBuffer(Buffer* buffer)
 
 	header_map_["Content-Length"] = std::to_string(body_size_);
 
-	buffer->Append("HTTP/1.1 ", 9);
+	buffer->Append("HTTP/1.1 ");
 	buffer->Append(StatusCodeToString(status_code_));
 	buffer->AppendCRLF();
 
@@ -101,9 +102,9 @@ std::string HttpResponse::StatusCodeToString(HttpResponse::StatusCode status_cod
 }
 
 
-bool HttpResponse::IsKeepConnection() const
+bool HttpResponse::CloseConnection() const
 {
-	return keep_connection_;
+	return close_connection_;
 }
 
 

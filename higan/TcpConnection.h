@@ -60,8 +60,9 @@ public:
 	 */
 	bool GetContext(const std::string& context_key, std::any** context);
 
-	ssize_t Send(char* data, size_t len);
+	ssize_t Send(const char* data, size_t len);
 	ssize_t Send(Buffer* buffer);
+	ssize_t Send(const std::string& data);
 
 	void CloseConnection();
 
