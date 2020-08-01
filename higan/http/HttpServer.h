@@ -48,11 +48,11 @@ private:
 	/**
 	 * 发送文件到指定连接
 	 * @param connection 发送到的连接
-	 * @param file_url 待发送文件路径
+	 * @param file_ptr_ 待发送文件路径
 	 * @param keep_connection 保持连接
-	 * @return true 发送完毕或出错 false 未发送完毕
+	 * @return
 	 */
-	bool SendFile(const TcpConnectionPtr& connection, const std::string& file_url, bool keep_connection);
+	void SendFile(const TcpConnectionPtr& connection, const File::FilePtr& file_ptr_, bool keep_connection);
 
 	/**
 	 * 发送文件到指定连接

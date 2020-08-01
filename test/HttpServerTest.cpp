@@ -7,6 +7,7 @@
 #include <higan/EventLoop.h>
 #include <higan/utils/Codec.h>
 #include <csignal>
+#include <higan/utils/Logger.h>
 
 std::string web_root = "/usr/local/web/blog";
 
@@ -16,8 +17,6 @@ void OnHttpRequest(const higan::TcpConnectionPtr& conn, const higan::HttpRequest
 	std::cout << "request from: " << conn->GetConnectionName() << std::endl;
 	std::cout << request.GetMethodString() << " " << request.GetUrl() << std::endl;
 
-	std::string file_path = web_root + request.GetUrl();
-
 	for (const auto& kv : request.GetHeaderMap())
 	{
 		std::cout << kv.first << ": " << kv.second << std::endl;
@@ -26,32 +25,27 @@ void OnHttpRequest(const higan::TcpConnectionPtr& conn, const higan::HttpRequest
 
 	response["Server"] = "higan";
 
-	response.SetStatusCode(higan::HttpResponse::STATUS_200_OK);
-	response.AppendBody("hello, world!\n");
+	const std::string& url = request.GetUrl();
 
-//	struct stat file_status;
-//
-//	if (stat(file_path.c_str(), &file_status) == -1)
-//	{
-//		response.SetStatusCode(higan::HttpResponse::STATUS_404_NOT_FOUND);
-//		response.AppendBody("file don't exist");
-//		return;
-//	}
-//
-//	if (S_ISDIR(file_status.st_mode))
-//	{
-//		file_path += "/index.html";
-//
-//		if (stat(file_path.c_str(), &file_status) == -1)
-//		{
-//			response.SetStatusCode(higan::HttpResponse::STATUS_404_NOT_FOUND);
-//			response.AppendBody("file don't exist");
-//			return;
-//		}
-//	}
-//
-//	response.SetStatusCode(higan::HttpResponse::STATUS_200_OK);
-//	response.SetFileToResponse(file_path);
+	if (url == "/hello")
+	{
+		response.SetStatusCode(higan::HttpResponse::STATUS_200_OK);
+		response.AppendBody("hello, world!\n");
+	}
+	else
+	{
+		std::string file_path = web_root + request.GetUrl();
+		if (response.SetFileToResponse(file_path))
+		{
+			response.SetStatusCode(higan::HttpResponse::STATUS_200_OK);
+			LOG("send file: %s success\n\n", file_path.c_str());
+		}
+		else
+		{
+			response.SetStatusCode(higan::HttpResponse::STATUS_404_NOT_FOUND);
+			LOG("send file: %s error\n\n", file_path.c_str());
+		}
+	}
 }
 
 higan::HttpServer* g_httpserver;

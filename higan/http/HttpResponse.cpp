@@ -9,13 +9,9 @@ using namespace higan;
 
 HttpResponse::HttpResponse(bool close_connection):
 	body_buffer_(),
-	body_size_(0),
-	file_path_(),
-	has_file_(false),
-	close_connection_(close_connection)
+	close_connection_(close_connection),
+	file_ptr_()
 {
-	header_map_["Connection"] = close_connection ? "close" : "Keep-Alive";
-	header_map_["Content-Length"] = "0";
 }
 
 HttpResponse::~HttpResponse()
@@ -40,11 +36,21 @@ void HttpResponse::EncodeToBuffer(Buffer* buffer)
 		return;
 	}
 
-	header_map_["Content-Length"] = std::to_string(body_size_);
+	if (file_ptr_)
+	{
+		header_map_["Content-Length"] = std::to_string(file_ptr_->GetFileSize());
+	}
+	else
+	{
+		header_map_["Content-Length"] = std::to_string(body_buffer_.ReadableSize());
+	}
+
 
 	buffer->Append("HTTP/1.1 ");
 	buffer->Append(StatusCodeToString(status_code_));
 	buffer->AppendCRLF();
+
+	header_map_["Connection"] = close_connection_ ? "close" : "Keep-Alive";
 
 	for (const auto& kv : header_map_)
 	{
@@ -58,7 +64,7 @@ void HttpResponse::EncodeToBuffer(Buffer* buffer)
 
 	buffer->AppendCRLF();
 
-	if (file_path_.empty())
+	if (!file_ptr_)
 	{
 		buffer->Append(&body_buffer_);
 	}
@@ -66,12 +72,11 @@ void HttpResponse::EncodeToBuffer(Buffer* buffer)
 
 void HttpResponse::AppendBody(const char* data, size_t len)
 {
-	if (has_file_)
+	if (!file_ptr_)
 	{
 		return;
 	}
 	body_buffer_.Append(data, len);
-	body_size_ += len;
 }
 
 void HttpResponse::AppendBody(const std::string& body)
@@ -108,22 +113,40 @@ bool HttpResponse::CloseConnection() const
 }
 
 
-void HttpResponse::SetFileToResponse(const std::string& file_path)
+bool HttpResponse::SetFileToResponse(const std::string& file_path)
 {
-	file_path_ = file_path;
-	has_file_ = true;
-	/**
-	 * TODO 更改文件大小获取方式
-	 */
-	body_size_ = static_cast<size_t>(File::GetFileSize(file_path_));
+	file_ptr_ = std::make_shared<File>(file_path);
+	bool add_result = true;
+
+	switch (file_ptr_->GetFileStatus())
+	{
+	case File::FileStatus::NOT_EXIST:
+		add_result = false;
+		break;
+	case File::FileStatus::IS_DIR:
+		add_result = SetFileToResponse(file_path + "/index.html");
+		break;
+	case File::FileStatus::FILE_OPEN_SUCCESS:
+		add_result = true;
+		break;
+	case File::FileStatus::FILE_OPEN_ERROR:
+		add_result = false;
+		break;
+	}
+
+	if (!add_result)
+	{
+		file_ptr_.reset();
+	}
+	return add_result;
 }
 
 bool HttpResponse::HasFileToResponse() const
 {
-	return has_file_;
+	return file_ptr_ != nullptr;
 }
 
-const std::string& HttpResponse::GetFilePath() const
+const File::FilePtr& HttpResponse::GetFilePtr() const
 {
-	return file_path_;
+	return file_ptr_;
 }

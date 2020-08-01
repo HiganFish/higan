@@ -43,6 +43,7 @@ private:
 	std::string server_name_;
 
 	Acceptor acceptor_;
+	InetAddress server_addr_;
 
 	TcpConnectionMap connection_map_;
 

@@ -76,22 +76,16 @@ void HttpServer::OnHttpRequest(const TcpConnectionPtr& connection, HttpRequest& 
 	response.EncodeToBuffer(&send_buffer);
 	connection->Send(&send_buffer);
 
-	if (response.HasFileToResponse())
-	{
-		if (SendFile(connection, response.GetFilePath(), close_connection))
-		{
-			if (close_connection)
-			{
-				connection->CloseConnection();
-			}
-		}
-	}
-	else
+	if (!response.HasFileToResponse())
 	{
 		if (close_connection)
 		{
 			connection->CloseConnection();
 		}
+	}
+	else
+	{
+		SendFile(connection, response.GetFilePtr(), close_connection);
 	}
 }
 
@@ -135,7 +129,6 @@ ssize_t HttpServer::SendFileInternal(const TcpConnectionPtr& connection, const F
 		}
 	}
 
-	return -1;
 }
 
 void HttpServer::OnMessageSendOver(const TcpConnectionPtr& connection)
@@ -148,7 +141,7 @@ void HttpServer::OnMessageSendOver(const TcpConnectionPtr& connection)
 
 	FileContext::FileContextPtr file_ptr = *std::any_cast<FileContext::FileContextPtr>(context_file);
 
-	ssize_t send_size = SendFileInternal(connection, file_ptr) > 0;
+	ssize_t send_size = SendFileInternal(connection, file_ptr);
 
 	if (send_size > 0)
 	{
@@ -164,7 +157,7 @@ void HttpServer::OnMessageSendOver(const TcpConnectionPtr& connection)
 			connection->CloseConnection();
 		}
 	}
-	else
+	else if (send_size == -1)
 	{
 		connection->CloseConnection();
 	}
@@ -175,24 +168,23 @@ bool HttpServer::CloseAllConnection()
 	return server_.CloseAllConnection();
 }
 
-bool HttpServer::SendFile(const TcpConnectionPtr& connection, const std::string& file_url, bool keep_connection)
+void HttpServer::SendFile(const TcpConnectionPtr& connection, const File::FilePtr& file_ptr_, bool keep_connection)
 {
-	FileContext::FileContextPtr file_context_ptr = std::make_shared<FileContext>(file_url,
+	FileContext::FileContextPtr file_context_ptr = std::make_shared<FileContext>(file_ptr_,
 			keep_connection);
-	ssize_t send_result = SendFileInternal(connection, file_context_ptr);
-	if (send_result > 0)
+	ssize_t send_size = SendFileInternal(connection, file_context_ptr);
+
+	if (send_size > 0)
 	{
 		connection->SetContext("HttpFileContext", std::any(file_context_ptr));
 		connection->SetCallSendOverCallback(true);
-
-		return false;
 	}
-	else if (send_result == 0)
+	else if (send_size == 0)
 	{
 		connection->SetCallSendOverCallback(false);
-
-		return true;
 	}
-
-	return true;
+	else if (send_size == -1)
+	{
+		connection->CloseConnection();
+	}
 }

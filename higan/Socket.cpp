@@ -108,3 +108,9 @@ ssize_t Socket::Send(const char* data, size_t len) const
 	}
 	return send(fd_, data, len, 0);
 }
+
+
+std::string Socket::GetAddrPortStr() const
+{
+	return address_.GetIpPort();
+}

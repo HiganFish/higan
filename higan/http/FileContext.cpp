@@ -6,10 +6,9 @@
 
 using namespace higan;
 
-FileContext::FileContext(const std::string& url, bool close_connection):
-		url_(url),
-		close_connection_(close_connection),
-		file_(url_)
+FileContext::FileContext(const File::FilePtr& file_ptr, bool close_connection):
+		file_ptr_(file_ptr),
+		close_connection_(close_connection)
 {
 
 }
@@ -21,7 +20,12 @@ FileContext::~FileContext()
 
 ssize_t FileContext::ReadFileToBuffer(Buffer* buffer)
 {
-	return file_.ReadFileToBuffer(buffer);
+	if (!buffer || !file_ptr_)
+	{
+		return -1;
+	}
+
+	return file_ptr_->ReadFileToBuffer(buffer);
 }
 
 bool FileContext::CloseConnection() const

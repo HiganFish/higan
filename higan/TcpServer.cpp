@@ -11,6 +11,7 @@ using namespace higan;
 TcpServer::TcpServer(EventLoop* loop, const InetAddress& addr, const std::string& server_name):
 		loop_(loop),
 		acceptor_(loop_, addr),
+		server_addr_(addr),
 		server_name_(server_name)
 {
 	acceptor_.SetNewConnectionCallback(std::bind(&TcpServer::OnNewConnection,
@@ -24,6 +25,7 @@ TcpServer::~TcpServer()
 
 void TcpServer::Start()
 {
+	LOG("server: %s, listen on %s", server_name_.c_str(), server_addr_.GetIpPort().c_str());
 	acceptor_.Listen();
 }
 

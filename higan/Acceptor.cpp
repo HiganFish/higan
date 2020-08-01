@@ -3,6 +3,7 @@
 //
 
 #include "higan/Acceptor.h"
+#include "higan/utils/Logger.h"
 
 using namespace higan;
 
