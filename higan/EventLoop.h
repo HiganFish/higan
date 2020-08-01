@@ -36,6 +36,8 @@ public:
 	 * @param func
 	 */
 	void RunInLoop(const PendingFunc& func);
+
+	void Quit();
 private:
 
 	std::unique_ptr<MultiplexBase> multiplex_base_;
@@ -47,13 +49,13 @@ private:
 
 	bool handling_pending_event_;
 	bool looping_;
+	bool quit_ = false;
 
 	std::queue<PendingFunc> pending_func_queue_;
 
-	void HandleActiveEvent(int active_event_num);
+	void HandleActiveEvent();
 
 	void HandleTimeoutEvent(int timeout);
-
 	void CallPendingFunc();
 };
 }

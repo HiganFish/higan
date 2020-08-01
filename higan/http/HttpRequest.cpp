@@ -10,8 +10,7 @@
 
 using namespace higan;
 
-const char HttpRequest::KV_SEPARATOR[] = ": ";
-const size_t HttpRequest::KV_SEPARATOR_LEN = strlen(KV_SEPARATOR);
+const char HttpRequest::COLON[] = ": ";
 
 HttpRequest::HttpRequest():
 		method_(HTTP_REQUEST_UNKNOWN),
@@ -86,7 +85,8 @@ bool HttpRequest::SetVersion(const char* begin, const char* end)
 
 bool HttpRequest::AddHeader(const char* begin, const char* end)
 {
-	const char* k_end = std::search(begin, end, KV_SEPARATOR, KV_SEPARATOR + KV_SEPARATOR_LEN);
+
+	const char* k_end = std::search(begin, end, COLON, COLON + 2);
 
 	if (end - k_end < 3)
 	{

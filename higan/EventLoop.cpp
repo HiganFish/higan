@@ -12,6 +12,7 @@ EventLoop::EventLoop():
 		multiplex_base_(new MultiplexEpoll()),
 		active_channel_list_(MultiplexEpoll::EPOLL_MAX_EVNETS),
 		looping_(false),
+		quit_(false),
 		handling_pending_event_(false)
 {
 
@@ -33,33 +34,32 @@ void EventLoop::Loop()
 
 	looping_ = true;
 
-	while (looping_)
+	while (!quit_)
 	{
-		int multiplex_result = multiplex_base_->LoopOnce(timeout, &active_channel_list_);
+		active_channel_list_.clear();
+		bool loop_timeout = multiplex_base_->LoopOnce(timeout, &active_channel_list_);
 
-		if (multiplex_result == -1)
-		{
-			looping_ = false;
-		}
-		else if (multiplex_result == 0)
+		if (loop_timeout)
 		{
 			HandleTimeoutEvent(timeout);
 		}
 		else
 		{
-			HandleActiveEvent(multiplex_result);
+			HandleActiveEvent();
 		}
 
 		CallPendingFunc();
 	}
+
+	looping_ = false;
 }
 
-void EventLoop::HandleActiveEvent(int active_event_num)
+void EventLoop::HandleActiveEvent()
 {
 	handling_pending_event_ = true;
-	for (int i = 0; i < active_event_num; ++i)
+	for (Channel* channel : active_channel_list_)
 	{
-		active_channel_list_[i]->HandleEvent();
+		channel->HandleEvent();
 	}
 	handling_pending_event_ = false;
 }
@@ -86,4 +86,9 @@ void EventLoop::RunInLoop(const EventLoop::PendingFunc& func)
 void EventLoop::UpdateChannel(Channel* channel)
 {
 	multiplex_base_->UpdateChannel(channel);
+}
+
+void EventLoop::Quit()
+{
+	quit_ = true;
 }

@@ -55,7 +55,7 @@ void TcpConnection::OnReadable()
 	{
 		if (message_callback_)
 		{
-			message_callback_(shared_from_this(), input_buffer_);
+			message_callback_(shared_from_this(), &input_buffer_);
 		}
 	}
 }
@@ -165,19 +165,16 @@ void TcpConnection::SetWriteOverCallback(const TcpConnectionCallback& callback)
 	write_over_callback_ = callback;
 }
 
-bool TcpConnection::GetContext(const std::string& context_key, std::any** context)
+std::any* TcpConnection::GetContext(const std::string& context_key)
 {
 	auto result = context_map_.find(context_key);
 
 	if (result == context_map_.end())
 	{
-		context = nullptr;
-		return false;
+		return nullptr;
 	}
 
-	*context = &result->second;
-
-	return true;
+	return &result->second;
 }
 
 void TcpConnection::DeleteContext(const std::string& context_key)

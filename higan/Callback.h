@@ -18,6 +18,6 @@ class Buffer;
 class TcpConnection;
 typedef std::shared_ptr<TcpConnection> TcpConnectionPtr;
 typedef std::function<void(const TcpConnectionPtr&)> TcpConnectionCallback;
-typedef std::function<void(const TcpConnectionPtr&, Buffer&)> MessageCallback;
+typedef std::function<void(const TcpConnectionPtr&, Buffer*)> MessageCallback;
 }
 #endif //HIGAN_CALLBACK_H

@@ -56,9 +56,9 @@ public:
 	 * 获取此Tcp连接的上下文
 	 * @param context_key 上下文key
 	 * @param context 上下文结果返回
-	 * @return true 存在此key对应的上下文 false不存在对应的上下文
+	 * @return nullptr key不存在
 	 */
-	bool GetContext(const std::string& context_key, std::any** context);
+	std::any* GetContext(const std::string& context_key);
 
 	ssize_t Send(const char* data, size_t len);
 	ssize_t Send(Buffer* buffer);

@@ -25,7 +25,7 @@ public:
 
 	virtual void UpdateChannel(Channel* channel);
 
-	virtual int LoopOnce(int timeout, MultiplexBase::ChannelList* active_channel_list);
+	virtual bool LoopOnce(int timeout, MultiplexBase::ChannelList* active_channel_list);
 
 private:
 

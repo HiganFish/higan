@@ -36,29 +36,36 @@ void HttpResponse::EncodeToBuffer(Buffer* buffer)
 		return;
 	}
 
-	if (file_ptr_)
+	char line_buff[64];
+	int len = snprintf(line_buff, sizeof line_buff, "HTTP/1.1 %s\r\n", StatusCodeToString(status_code_).c_str());
+	buffer->Append(line_buff, len);
+
+	if (close_connection_)
 	{
-		header_map_["Content-Length"] = std::to_string(file_ptr_->GetFileSize());
+		buffer->Append("Connection: close\r\n");
 	}
 	else
 	{
-		header_map_["Content-Length"] = std::to_string(body_buffer_.ReadableSize());
+		buffer->Append("Connection: Keep-Alive\r\n");
+
+		size_t body_size = -1;
+		if (file_ptr_)
+		{
+			body_size= file_ptr_->GetFileSize();
+		}
+		else
+		{
+			body_size = body_buffer_.ReadableSize();
+		}
+		len = snprintf(line_buff, sizeof line_buff, "Content-Length: %zd\r\n", body_size);
+		buffer->Append(line_buff, len);
 	}
-
-
-	buffer->Append("HTTP/1.1 ");
-	buffer->Append(StatusCodeToString(status_code_));
-	buffer->AppendCRLF();
-
-	header_map_["Connection"] = close_connection_ ? "close" : "Keep-Alive";
 
 	for (const auto& kv : header_map_)
 	{
-		std::string line = kv.first;
-		line.append(HttpRequest::KV_SEPARATOR, HttpRequest::KV_SEPARATOR_LEN);
-		line.append(kv.second);
-
-		buffer->Append(line);
+		buffer->Append(kv.first);
+		buffer->Append(": ");
+		buffer->Append(kv.second);
 		buffer->AppendCRLF();
 	}
 

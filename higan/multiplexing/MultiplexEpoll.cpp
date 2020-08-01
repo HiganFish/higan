@@ -26,31 +26,34 @@ MultiplexEpoll::~MultiplexEpoll()
 	close(epollfd_);
 }
 
-int MultiplexEpoll::LoopOnce(int timeout, MultiplexBase::ChannelList* active_channel_list)
+bool MultiplexEpoll::LoopOnce(int timeout, MultiplexBase::ChannelList* active_channel_list)
 {
-
 	int epoll_ret = epoll_wait(epollfd_, &epoll_events_[0], EPOLL_MAX_EVNETS, timeout);
-
 
 	if (epoll_ret < 0)
 	{
 		if (errno != EINTR)
 		{
 			LOG_IF(true, "epoll_wait error");
-			return -1;
+			exit(errno);
 		}
-		return 0;
 	}
 	else if (epoll_ret == 0)
 	{
-
+		return true;
 	}
 	else
 	{
 		FillActiveChannelList(epoll_ret, active_channel_list);
+		if(static_cast<size_t>(epoll_ret) == epoll_events_.size())
+		{
+			epoll_events_.resize(epoll_events_.size() * 2);
+		}
+
+		return false;
 	}
 
-	return epoll_ret;
+	return false;
 }
 
 void MultiplexEpoll::FillActiveChannelList(int active_event_num, MultiplexBase::ChannelList* active_channel_list)
@@ -74,7 +77,7 @@ void MultiplexEpoll::FillActiveChannelList(int active_event_num, MultiplexBase::
 		channel->SetChannelWritable(epoll_events_[i].events & EPOLLOUT);
 		channel->SetChannelError(epoll_events_[i].events & (EPOLLERR | EPOLLHUP));
 
-		(*active_channel_list)[i] = channel;
+		active_channel_list->push_back(channel);
 	}
 }
 

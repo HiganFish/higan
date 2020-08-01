@@ -19,7 +19,7 @@ void MultiplexBase::UpdateChannel(Channel *channel)
 
 }
 
-int MultiplexBase::LoopOnce(int timeout, MultiplexBase::ChannelList* active_channel_list)
+bool MultiplexBase::LoopOnce(int timeout, MultiplexBase::ChannelList* active_channel_list)
 {
-	return 0;
+	return false;
 }

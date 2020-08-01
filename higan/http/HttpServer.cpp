@@ -27,17 +27,16 @@ void HttpServer::Start()
 
 void HttpServer::OnNewConnection(const TcpConnectionPtr& connection)
 {
-	connection->SetContext("HttpContext", std::any(HttpContext()));
+	connection->SetContext("HttpContext", HttpContext());
 	connection->SetWriteOverCallback(std::bind(&HttpServer::OnMessageSendOver, this, _1));
 }
 
-void HttpServer::OnNewMessage(const TcpConnectionPtr& connection, Buffer& buffer)
+void HttpServer::OnNewMessage(const TcpConnectionPtr& connection, Buffer* buffer)
 {
-	std::any* context_any = nullptr;
-	connection->GetContext("HttpContext", &context_any);
-	HttpContext* context = std::any_cast<HttpContext>(context_any);
+	HttpContext* context =
+			std::any_cast<HttpContext>(connection->GetContext("HttpContext"));
 
-	bool parse_ok = context->ParseRequest(&buffer);
+	bool parse_ok = context->ParseRequest(buffer);
 
 	if (!parse_ok)
 	{
@@ -136,10 +135,8 @@ void HttpServer::OnMessageSendOver(const TcpConnectionPtr& connection)
 	/**
 	 * 如果存在相关上下文 说明文件未发送完毕 继续发送
 	 */
-	std::any* context_file = nullptr;
-	connection->GetContext("HttpFileContext", &context_file);
-
-	FileContext::FileContextPtr file_ptr = *std::any_cast<FileContext::FileContextPtr>(context_file);
+	FileContext::FileContextPtr file_ptr = *std::any_cast<FileContext::FileContextPtr>(
+			connection->GetContext("HttpFileContext"));
 
 	ssize_t send_size = SendFileInternal(connection, file_ptr);
 

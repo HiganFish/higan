@@ -9,7 +9,7 @@
 
 using namespace higan;
 
-const int Buffer::DEFAULT_BUFFER_SIZE = 4096;
+const int Buffer::DEFAULT_BUFFER_SIZE = 1024;
 const int Buffer::DEFAULT_READ_INDEX = 8;
 const int Buffer::DEFAULT_WRITE_INDEX = 8;
 const int Buffer::MAX_EX_BUFFER_SIZE = 65535;

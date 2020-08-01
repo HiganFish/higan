@@ -39,7 +39,7 @@ private:
 
 	void OnNewConnection(const TcpConnectionPtr& connection);
 
-	void OnNewMessage(const TcpConnectionPtr& connection, Buffer& buffer);
+	void OnNewMessage(const TcpConnectionPtr& connection, Buffer* buffer);
 
 	void OnMessageSendOver(const TcpConnectionPtr& connection);
 
