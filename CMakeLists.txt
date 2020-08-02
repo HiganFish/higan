@@ -8,4 +8,3 @@ SET(CMAKE_CXX_FLAGS
 )
 
 add_subdirectory(higan)
-add_subdirectory(test)
