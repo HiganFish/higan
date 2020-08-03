@@ -64,6 +64,8 @@ private:
 
 	void RemoveConnection(const TcpConnectionPtr& connection_ptr);
 
+	void RemoveConnectionInLoop(const TcpConnectionPtr& connection_ptr);
+
 	void OnConnectionError(const TcpConnectionPtr& connection_ptr);
 
 };

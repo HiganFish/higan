@@ -30,10 +30,6 @@ TcpConnection::~TcpConnection()
 	{
 		LOG("connection: %s closed by destructor", connection_name_.c_str());
 	}
-	else
-	{
-		LOG("connection: %s closed", connection_name_.c_str());
-	}
 }
 
 void TcpConnection::ConnectionEstablished()
@@ -186,17 +182,22 @@ void TcpConnection::DeleteContext(const std::string& context_key)
 	context_map_.erase(context_key);
 }
 
-void TcpConnection::CloseConnection()
+void TcpConnection::DestroyConnection()
 {
-	OnError();
-}
-
-bool TcpConnection::IsCallSendOverCallback() const
-{
-	return call_send_over_callback_;
+	if (connecting_)
+	{
+		connecting_ = false;
+		channel_.DisableAll();
+		LOG("connection: %s closed", connection_name_.c_str());
+	}
 }
 
 void TcpConnection::SetCallSendOverCallback(bool callSendOverCallback)
 {
 	call_send_over_callback_ = callSendOverCallback;
+}
+
+EventLoop* TcpConnection::GetEventLoop()
+{
+	return loop_;
 }

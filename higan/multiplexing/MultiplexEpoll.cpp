@@ -12,7 +12,7 @@
 using namespace higan;
 
 const int MultiplexEpoll::EPOLL_MAX_EVNETS = 100;
-const int MultiplexEpoll::EPOLL_DEFAULT_EVENT = EPOLLET;
+const int MultiplexEpoll::EPOLL_DEFAULT_EVENT = 0;
 
 MultiplexEpoll::MultiplexEpoll():
 		epollfd_(epoll_create(5)),
@@ -28,29 +28,33 @@ MultiplexEpoll::~MultiplexEpoll()
 
 bool MultiplexEpoll::LoopOnce(int timeout, MultiplexBase::ChannelList* active_channel_list)
 {
-	int epoll_ret = epoll_wait(epollfd_, &epoll_events_[0], EPOLL_MAX_EVNETS, timeout);
+	// EPOLLET 模式下如果maxevents太小 导致无法接受全部event 并不会丢弃 只有接收来的才会被丢弃
+	int event_num = epoll_wait(epollfd_, &*epoll_events_.begin(), static_cast<int>(epoll_events_.size()), timeout);
 
-	if (epoll_ret < 0)
+	if (event_num > 0)
+	{
+		static int sum_event = 0;
+		sum_event += event_num;
+
+		printf("sum event: %d\r\n", sum_event);
+
+		FillActiveChannelList(event_num, active_channel_list);
+		if(static_cast<size_t>(event_num) == epoll_events_.size())
+		{
+			epoll_events_.resize(epoll_events_.size() * 2);
+		}
+	}
+	else if (event_num == 0)
+	{
+		return true;
+	}
+	else if (event_num < 0)
 	{
 		if (errno != EINTR)
 		{
 			LOG_IF(true, "epoll_wait error");
 			exit(errno);
 		}
-	}
-	else if (epoll_ret == 0)
-	{
-		return true;
-	}
-	else
-	{
-		FillActiveChannelList(epoll_ret, active_channel_list);
-		if(static_cast<size_t>(epoll_ret) == epoll_events_.size())
-		{
-			epoll_events_.resize(epoll_events_.size() * 2);
-		}
-
-		return false;
 	}
 
 	return false;

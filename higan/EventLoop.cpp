@@ -13,7 +13,8 @@ EventLoop::EventLoop():
 		active_channel_list_(MultiplexEpoll::EPOLL_MAX_EVNETS),
 		looping_(false),
 		quit_(false),
-		handling_pending_event_(false)
+		handling_pending_event_(false),
+		mutex_()
 {
 
 }
@@ -71,16 +72,30 @@ void EventLoop::HandleTimeoutEvent(int timeout)
 
 void EventLoop::CallPendingFunc()
 {
-	while (!pending_func_queue_.empty())
+	std::queue<PendingFunc> pending;
+
 	{
-		pending_func_queue_.front()();
-		pending_func_queue_.pop();
+		/**
+		 * muduo这里太妙了 swap之后 立刻释放锁 对CallPendingFunc和RunInLoop影响都很小
+		 * 如果不进行拷贝 而是加锁后直接处理pending_func_queue_会对RunInLoop产生较大影响
+		 */
+		MutexLockGuard guard(mutex_);
+		pending.swap(pending_func_queue_);
+	}
+
+	while (!pending.empty())
+	{
+		pending.front()();
+		pending.pop();
 	}
 }
 
 void EventLoop::RunInLoop(const EventLoop::PendingFunc& func)
 {
-	pending_func_queue_.push(func);
+	{
+		MutexLockGuard guard(mutex_);
+		pending_func_queue_.push(func);
+	}
 }
 
 void EventLoop::UpdateChannel(Channel* channel)

@@ -10,6 +10,7 @@
 #include <queue>
 
 #include "higan/multiplexing/MultiplexBase.h"
+#include "higan/base/Mutex.h"
 
 namespace higan
 {
@@ -52,6 +53,8 @@ private:
 	bool quit_ = false;
 
 	std::queue<PendingFunc> pending_func_queue_;
+
+	Mutex mutex_;
 
 	void HandleActiveEvent();
 

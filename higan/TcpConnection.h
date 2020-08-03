@@ -64,11 +64,11 @@ public:
 	ssize_t Send(Buffer* buffer);
 	ssize_t Send(const std::string& data);
 
-	void CloseConnection();
-
-	bool IsCallSendOverCallback() const;
+	void DestroyConnection();
 
 	void SetCallSendOverCallback(bool callSendOverCallback);
+
+	EventLoop* GetEventLoop();
 
 private:
 	EventLoop* loop_;

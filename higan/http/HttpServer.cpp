@@ -44,7 +44,7 @@ void HttpServer::OnNewMessage(const TcpConnectionPtr& connection, Buffer* buffer
 		 * 解析失败直接简单粗暴返回错误 .... 可以可以 不分配多余的资源
 		 */
 		connection->Send("HTTP/1.1 400 Bad Request\r\n\r\n");
-		connection->CloseConnection();
+		connection->DestroyConnection();
 	}
 
 	if (context->ParseOver())
@@ -79,7 +79,7 @@ void HttpServer::OnHttpRequest(const TcpConnectionPtr& connection, HttpRequest& 
 	{
 		if (close_connection)
 		{
-			connection->CloseConnection();
+			connection->DestroyConnection();
 		}
 	}
 	else
@@ -151,12 +151,12 @@ void HttpServer::OnMessageSendOver(const TcpConnectionPtr& connection)
 
 		if (file_ptr->CloseConnection())
 		{
-			connection->CloseConnection();
+			connection->DestroyConnection();
 		}
 	}
 	else if (send_size == -1)
 	{
-		connection->CloseConnection();
+		connection->DestroyConnection();
 	}
 }
 
@@ -182,7 +182,7 @@ void HttpServer::SendFile(const TcpConnectionPtr& connection, const File::FilePt
 	}
 	else if (send_size == -1)
 	{
-		connection->CloseConnection();
+		connection->DestroyConnection();
 	}
 }
 

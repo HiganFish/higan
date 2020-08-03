@@ -47,19 +47,20 @@ void HttpResponse::EncodeToBuffer(Buffer* buffer)
 	else
 	{
 		buffer->Append("Connection: Keep-Alive\r\n");
-
-		size_t body_size = -1;
-		if (file_ptr_)
-		{
-			body_size= file_ptr_->GetFileSize();
-		}
-		else
-		{
-			body_size = body_buffer_.ReadableSize();
-		}
-		len = snprintf(line_buff, sizeof line_buff, "Content-Length: %zd\r\n", body_size);
-		buffer->Append(line_buff, len);
 	}
+
+	size_t body_size = -1;
+	if (file_ptr_)
+	{
+		body_size= file_ptr_->GetFileSize();
+	}
+	else
+	{
+		body_size = body_buffer_.ReadableSize();
+	}
+	len = snprintf(line_buff, sizeof line_buff, "Content-Length: %zd\r\n", body_size);
+	buffer->Append(line_buff, len);
+
 
 	for (const auto& kv : header_map_)
 	{
@@ -79,7 +80,7 @@ void HttpResponse::EncodeToBuffer(Buffer* buffer)
 
 void HttpResponse::AppendBody(const char* data, size_t len)
 {
-	if (!file_ptr_)
+	if (file_ptr_)
 	{
 		return;
 	}
