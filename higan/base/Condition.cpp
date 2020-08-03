@@ -10,8 +10,11 @@ Condition::Condition(Mutex& mutex):
 		mutex_(mutex),
 		cond_()
 {
-	pthread_condattr_t cond_attr;
-	PTHREAD_CHECK(pthread_cond_init(&cond_, &cond_attr));
+	/**
+	 * 如果不设置其他参数 应该传入nullptr 如果传入未初始化的
+	 * pthread_cond_attr 会出错
+	 */
+	PTHREAD_CHECK(pthread_cond_init(&cond_, nullptr));
 }
 
 Condition::~Condition()
@@ -27,4 +30,9 @@ void Condition::Wait()
 void Condition::Notify()
 {
 	PTHREAD_CHECK(pthread_cond_signal(&cond_));
+}
+
+void Condition::NotifyAll()
+{
+	PTHREAD_CHECK(pthread_cond_broadcast(&cond_));
 }

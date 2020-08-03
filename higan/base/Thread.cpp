@@ -28,7 +28,9 @@ void* ThreadInternalFunction(void* args)
 		return nullptr;
 	}
 
+	LOG("Thread: %s, call start", attr->name.c_str());
 	attr->func();
+	LOG("Thread: %s, call end", attr->name.c_str());
 
 	return nullptr;
 }
@@ -37,15 +39,15 @@ Thread::Thread(const std::string& name):
 		name_(name),
 		thread_()
 {
-
+	LOG("create thread: %s", name_.c_str());
 }
 
 Thread::~Thread()
 {
-
+	LOG("destroy thread: %s", name_.c_str());
 }
 
-bool Thread::CallFunc(const Thread::ThreadFunc& func)
+bool Thread::CallFunction(const ThreadFunc& func)
 {
 	ThreadInternalAttr *attr = new ThreadInternalAttr(name_, func);
 
@@ -54,7 +56,6 @@ bool Thread::CallFunc(const Thread::ThreadFunc& func)
 		LOG_IF(true, "thread: %s pthread_create error", name_.c_str());
 		return false;
 	}
-
 
 	return true;
 }

@@ -8,8 +8,7 @@ using namespace higan;
 
 Mutex::Mutex()
 {
-	pthread_mutexattr_t attr;
-	PTHREAD_CHECK(pthread_mutex_init(&mutex_, &attr));
+	PTHREAD_CHECK(pthread_mutex_init(&mutex_, nullptr));
 }
 
 Mutex::~Mutex()

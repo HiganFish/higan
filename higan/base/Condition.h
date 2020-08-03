@@ -12,12 +12,14 @@ namespace higan
 class Condition
 {
 public:
-	Condition(Mutex& mutex);
+	explicit Condition(Mutex& mutex);
 	~Condition();
 
 	void Wait();
 
 	void Notify();
+
+	void NotifyAll();
 private:
 
 	Mutex& mutex_;
