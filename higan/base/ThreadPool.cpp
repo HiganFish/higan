@@ -2,7 +2,8 @@
 // Created by rjd67 on 2020/8/2.
 //
 
-#include "ThreadPool.h"
+#include "higan/base/ThreadPool.h"
+#include "higan/utils/Logger.h"
 
 using namespace higan;
 
@@ -27,6 +28,9 @@ ThreadPool::~ThreadPool()
 
 void ThreadPool::Init(int thread_num)
 {
+
+	EXIT_IF(running_, "ThreadPool %s is running", name_.c_str());
+
 	running_ = true;
 
 	for (int i = 0; i < thread_num; ++i)

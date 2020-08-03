@@ -9,6 +9,7 @@
 #include <cstdarg>
 #include <cerrno>
 #include <cstring>
+#include <cstdlib>
 
 inline void LOG_IF(bool r, const char* format, ...)
 {

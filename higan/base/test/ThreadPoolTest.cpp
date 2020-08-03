@@ -6,20 +6,25 @@
 #include <iostream>
 #include <unistd.h>
 
-higan::Mutex mutex;
-
 void Foo()
 {
-	higan::MutexLockGuard guard(mutex);
 	std::cout << "Foo? Foo!" << std::endl;
+
+	sleep(1);
 }
 
 int main()
 {
+
 	{
+		/**
+		 * 测试detach 未被Join线程
+		 */
 		higan::Thread thread("TestThread", Foo);
 		thread.Start();
 	}
+
+
 	higan::ThreadPool pool("TestThreadPool");
 	pool.Init(2);
 
