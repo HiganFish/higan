@@ -25,13 +25,16 @@ public:
 	 * 初始化线程池 创建线程
 	 * @param thread_num 线程数量
 	 */
-	void Init(int thread_num);
+	void Start();
+	void SetThreadNum(int thread_num);
 
 	/**
 	 * 获取下一个EventLoop
 	 * @return 当线程池没有线程的时候返回base_loop 否则从线程池中选择一个线程的EventLoop返回
 	 */
 	EventLoop* GetNextEventLoop();
+
+	void Stop();
 
 private:
 	std::string name_;

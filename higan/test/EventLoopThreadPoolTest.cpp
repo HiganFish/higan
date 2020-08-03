@@ -22,7 +22,8 @@ int main()
 
 	higan::EventLoopThreadPool pool("TestEventLoopThreadPool", &base_loop);
 
-	pool.Init(3);
+	pool.SetThreadNum(4);
+	pool.Start();
 
 	for (int i = 0; i < 10; ++i)
 	{

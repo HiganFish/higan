@@ -9,9 +9,9 @@ void OnConnection(const higan::TcpConnectionPtr& conn)
 	printf("---new---\n");
 }
 
-void OnMessage(const higan::TcpConnectionPtr& conn, higan::Buffer& buffer)
+void OnMessage(const higan::TcpConnectionPtr& conn, higan::Buffer* buffer)
 {
-	printf("from %s\n%s\n", conn->GetConnectionName().c_str(), buffer.ReadAllAsString().c_str());
+	printf("from %s\n%s\n", conn->GetConnectionName().c_str(), buffer->ReadAllAsString().c_str());
 }
 
 int main()
@@ -21,9 +21,13 @@ int main()
 	higan::EventLoop loop;
 
 	higan::TcpServer server(&loop, address, "TcpServerTest");
+	server.SetThreadNum(4);
+
 	server.SetMessageCallback(OnMessage);
 	server.SetMewConnectionCallback(OnConnection);
 
 	server.Start();
 	loop.Loop();
+
+	return 0;
 }

@@ -28,9 +28,9 @@ void* ThreadInternalFunction(void* args)
 		return nullptr;
 	}
 
-	LOG("Thread: %s, call start", attr->name.c_str());
+	// LOG("Thread: %s, call start", attr->name.c_str());
 	attr->func();
-	LOG("Thread: %s, call end", attr->name.c_str());
+	// LOG("Thread: %s, call end", attr->name.c_str());
 
 	return nullptr;
 }
@@ -55,10 +55,6 @@ Thread::~Thread()
 		LOG("detach thread: %s", name_.c_str());
 		pthread_detach(thread_);
 	}
-	else
-	{
-		LOG("exit thread: %s", name_.c_str());
-	}
 }
 
 void Thread::Start()
@@ -74,7 +70,7 @@ void Thread::Start()
 		LOG_IF(true, "thread: %s pthread_create error", name_.c_str());
 	}
 
-	LOG("create thread: %s", name_.c_str());
+	// LOG("create thread: %s", name_.c_str());
 
 }
 
@@ -85,5 +81,6 @@ void Thread::Join()
 
 	joined = true;
 	pthread_join(thread_, nullptr);
+	LOG("exit thread: %s", name_.c_str());
 }
 

@@ -11,6 +11,7 @@
 #include "higan/utils/noncopyable.h"
 #include "higan/Acceptor.h"
 #include "higan/TcpConnection.h"
+#include "higan/EventLoopThreadPool.h"
 
 namespace higan
 {
@@ -30,16 +31,19 @@ public:
 
 	void Start();
 
+	void SetThreadNum(int thread_num);
+
 	void SetMessageCallback(const MessageCallback& callback);
 	void SetMewConnectionCallback(const TcpConnectionCallback& callback);
 
-	bool CloseAllConnection();
+	void Stop();
 
 private:
 
 	typedef std::map<int, TcpConnectionPtr> TcpConnectionMap;
 
 	EventLoop* loop_;
+	EventLoopThreadPool thread_pool_;
 	std::string server_name_;
 
 	Acceptor acceptor_;

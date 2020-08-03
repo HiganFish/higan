@@ -17,11 +17,11 @@ void OnHttpRequest(const higan::TcpConnectionPtr& conn, const higan::HttpRequest
 	std::cout << "request from: " << conn->GetConnectionName() << std::endl;
 	std::cout << request.GetMethodString() << " " << request.GetUrl() << std::endl;
 
-	for (const auto& kv : request.GetHeaderMap())
-	{
-		std::cout << kv.first << ": " << kv.second << std::endl;
-	}
-	std::cout << std::endl;
+//	for (const auto& kv : request.GetHeaderMap())
+//	{
+//		std::cout << kv.first << ": " << kv.second << std::endl;
+//	}
+//	std::cout << std::endl;
 
 	response["Server"] = "higan";
 
@@ -54,7 +54,7 @@ void CloseAllConnection(int signal)
 {
 	if (signal == SIGINT)
 	{
-		g_httpserver->CloseAllConnection();
+		g_httpserver->Stop();
 		exit(signal);
 	}
 }
@@ -69,6 +69,8 @@ int main()
 	higan::EventLoop loop;
 
 	higan::HttpServer server(&loop, address, "HttpServerTest");
+	server.SetThreadNum(3);
+
 	g_httpserver = &server;
 
 	server.SetHttpRequestCallback(OnHttpRequest);
@@ -76,4 +78,6 @@ int main()
 	server.Start();
 
 	loop.Loop();
+
+	return 0;
 }

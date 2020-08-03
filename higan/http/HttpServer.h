@@ -29,7 +29,9 @@ public:
 
 	void SetHttpRequestCallback(const HttpCallback& callback);
 
-	bool CloseAllConnection();
+	void Stop();
+
+	void SetThreadNum(int thread_num);
 
 private:
 

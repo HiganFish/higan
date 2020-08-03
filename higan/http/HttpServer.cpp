@@ -160,9 +160,9 @@ void HttpServer::OnMessageSendOver(const TcpConnectionPtr& connection)
 	}
 }
 
-bool HttpServer::CloseAllConnection()
+void HttpServer::Stop()
 {
-	return server_.CloseAllConnection();
+	server_.Stop();
 }
 
 void HttpServer::SendFile(const TcpConnectionPtr& connection, const File::FilePtr& file_ptr_, bool keep_connection)
@@ -184,4 +184,9 @@ void HttpServer::SendFile(const TcpConnectionPtr& connection, const File::FilePt
 	{
 		connection->CloseConnection();
 	}
+}
+
+void HttpServer::SetThreadNum(int thread_num)
+{
+	server_.SetThreadNum(thread_num);
 }

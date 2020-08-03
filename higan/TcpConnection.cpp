@@ -30,17 +30,21 @@ TcpConnection::~TcpConnection()
 	{
 		LOG("connection: %s closed by destructor", connection_name_.c_str());
 	}
+	else
+	{
+		LOG("connection: %s closed", connection_name_.c_str());
+	}
 }
 
 void TcpConnection::ConnectionEstablished()
 {
-	channel_.EnableReadable();
-	connecting_ = true;
-
 	if (new_connection_callback_)
 	{
 		new_connection_callback_(shared_from_this());
 	}
+
+	channel_.EnableReadable();
+	connecting_ = true;
 }
 
 void TcpConnection::OnReadable()

@@ -23,19 +23,17 @@ EventLoopThreadPool::~EventLoopThreadPool()
 	running_ = false;
 }
 
-void EventLoopThreadPool::Init(int thread_num)
+void EventLoopThreadPool::Start()
 {
 	EXIT_IF(running_, "EventLoopThreadPool %s is running", name_.c_str());
 
 	running_ = true;
 
-	for (int i = 0; i < thread_num; ++i)
+	for (int i = 0; i < thread_num_; ++i)
 	{
-		threads_.emplace_back(new EventLoopThread(name_ + "@thread-" + std::to_string(thread_num)));
+		threads_.emplace_back(new EventLoopThread(name_ + "@thread-" + std::to_string(i)));
 		event_loops_.push_back(threads_[i]->GetEventLoop());
 	}
-
-	thread_num_ = thread_num;
 }
 
 EventLoop* EventLoopThreadPool::GetNextEventLoop()
@@ -53,4 +51,19 @@ EventLoop* EventLoopThreadPool::GetNextEventLoop()
 	}
 
 	return result;
+}
+
+void EventLoopThreadPool::SetThreadNum(int thread_num)
+{
+	thread_num_ = thread_num;
+}
+
+void EventLoopThreadPool::Stop()
+{
+	if (running_)
+	{
+		running_ = false;
+		event_loops_.clear();
+		threads_.clear();
+	}
 }
