@@ -31,6 +31,18 @@ inline void LOG(const char* format, ...)
 	printf("\n");
 }
 
+inline void EXIT_IF(bool r, const char* format, ...)
+{
+	if (r)
+	{
+		va_list args;
+		va_start(args, format);
+		vprintf(format, args);
+		va_end(args);
+		abort();
+	}
+}
+
 namespace higan
 {
 class Logger

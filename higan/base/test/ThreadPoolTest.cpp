@@ -16,6 +16,10 @@ void Foo()
 
 int main()
 {
+	{
+		higan::Thread thread("TestThread", Foo);
+		thread.Start();
+	}
 	higan::ThreadPool pool("TestThreadPool");
 	pool.Init(2);
 

@@ -17,25 +17,32 @@ public:
 	typedef std::function<void()> ThreadFunc;
 
 	/**
-	 * 创建线程包装
+	 * 创建线程
 	 * @param name 线程名称
+	 * @param function 线程执行函数
 	 */
-	explicit Thread(const std::string& name);
+	explicit Thread(const std::string& name, const ThreadFunc& function);
 	~Thread();
 
-	void Join() const;
+	/**
+	 * 当且仅当线程启动并且 未被Join才能调用 否则出错
+	 */
+	void Join();
 
 	/**
-	 * 每次调用会创建新的线程 线程执行完func后自动退出
-	 * @param func
-	 * @return
+	 * 启动线程执行设定的函数, 线程只能启动一次 否则出错
 	 */
-	bool CallFunction(const ThreadFunc& func);
+	void Start();
 
 private:
 	std::string name_;
 
 	pthread_t thread_;
+
+	ThreadFunc function_;
+
+	bool started;
+	bool joined;
 
 };
 }

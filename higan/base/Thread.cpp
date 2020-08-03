@@ -35,33 +35,55 @@ void* ThreadInternalFunction(void* args)
 	return nullptr;
 }
 
-Thread::Thread(const std::string& name):
+Thread::Thread(const std::string& name, const ThreadFunc& function):
 		name_(name),
-		thread_()
+		thread_(),
+		function_(function),
+		started(false),
+		joined(false)
 {
-	LOG("create thread: %s", name_.c_str());
+
 }
 
 Thread::~Thread()
 {
-	LOG("destroy thread: %s", name_.c_str());
+	/**
+	 * 当线程未已经启动且未被Join detach线程继续运行 否则直接退出
+	 */
+	if (started && !joined)
+	{
+		LOG("detach thread: %s", name_.c_str());
+		pthread_detach(thread_);
+	}
+	else
+	{
+		LOG("exit thread: %s", name_.c_str());
+	}
 }
 
-bool Thread::CallFunction(const ThreadFunc& func)
+void Thread::Start()
 {
-	ThreadInternalAttr *attr = new ThreadInternalAttr(name_, func);
+	EXIT_IF(started, "Thread: %s had started", name_.c_str());
+
+	started = true;
+
+	ThreadInternalAttr *attr = new ThreadInternalAttr(name_, function_);
 
 	if (pthread_create(&thread_, nullptr, ThreadInternalFunction, static_cast<void*>(attr)) != 0)
 	{
 		LOG_IF(true, "thread: %s pthread_create error", name_.c_str());
-		return false;
 	}
 
-	return true;
+	LOG("create thread: %s", name_.c_str());
+
 }
 
-void Thread::Join() const
+void Thread::Join()
 {
+	EXIT_IF(!started, "Thread: %s hadn't start", name_.c_str());
+	EXIT_IF(joined, "Thread: %s had joined", name_.c_str());
+
+	joined = true;
 	pthread_join(thread_, nullptr);
 }
 

@@ -31,8 +31,9 @@ void ThreadPool::Init(int thread_num)
 
 	for (int i = 0; i < thread_num; ++i)
 	{
-		threads_.emplace_back(new Thread(name_ + "@thead-" + std::to_string(i)));
-		threads_[i]->CallFunction(std::bind(&ThreadPool::ThreadFunctionInternal, this));
+		threads_.emplace_back(new Thread(name_ + "@thead-" + std::to_string(i),
+				std::bind(&ThreadPool::ThreadFunctionInternal, this)));
+		threads_[i]->Start();
 	}
 }
 
