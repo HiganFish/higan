@@ -26,6 +26,10 @@ private:
 
 	bool close_connection_;
 
+
+	size_t sum_read_from_cache_;
+	bool read_over_;
+
 	File::FilePtr file_ptr_;
 };
 }

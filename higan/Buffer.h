@@ -72,6 +72,9 @@ public:
 	 * 将Buffer恢复为初始状态 清除所有数据
 	 */
 	void Reset();
+
+	void CopyFromBuffer(Buffer* buffer);
+
 private:
 
 	const static char CRLF[];

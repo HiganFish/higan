@@ -8,7 +8,7 @@
 #include <string>
 
 #include "higan/http/HttpRequest.h"
-#include "higan/utils/File.h"
+#include "higan/utils/FileCache.h"
 
 namespace higan
 {
@@ -24,7 +24,7 @@ public:
 		STATUS_500_SERVICE_ERROR = 500
 	};
 
-	explicit HttpResponse(bool close_connection);
+	explicit HttpResponse(FileCache* cache, bool close_connection);
 	~HttpResponse();
 
 	void SetStatusCode(StatusCode status_code);
@@ -55,6 +55,8 @@ public:
 	const File::FilePtr& GetFilePtr() const;
 
 private:
+
+	FileCache* file_cache_;
 
 	bool close_connection_;
 

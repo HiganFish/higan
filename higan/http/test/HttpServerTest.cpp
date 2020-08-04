@@ -4,7 +4,6 @@
 #include <iostream>
 
 #include <higan/http/HttpServer.h>
-#include <higan/EventLoop.h>
 #include <higan/utils/Codec.h>
 #include <csignal>
 #include <higan/utils/Logger.h>
@@ -70,6 +69,7 @@ int main()
 
 	higan::HttpServer server(&loop, address, "HttpServerTest");
 	server.SetThreadNum(3);
+	server.SetMaxFileCacheSize(10 * 1000 * 1000);
 
 	g_httpserver = &server;
 

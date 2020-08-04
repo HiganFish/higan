@@ -33,9 +33,16 @@ public:
 
 	void SetThreadNum(int thread_num);
 
+	/**
+	 * 设置单文件的缓存判断上限
+	 * @param cache_size 大小小于此值的文件将被缓存 单位字节
+	 */
+	void SetMaxFileCacheSize(size_t cache_size);
 private:
 
 	TcpServer server_;
+
+	FileCache file_cache_;
 
 	HttpCallback on_http_request_;
 

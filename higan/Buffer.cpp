@@ -158,7 +158,7 @@ void Buffer::Append(const char* begin, const char* end)
 
 void Buffer::Append(const char* begin, size_t len)
 {
-	if (len > ReadableSize())
+	if (len > WritableSize())
 	{
 		CopyExDataToBuffer(begin, len);
 	}
@@ -193,4 +193,12 @@ void Buffer::Reset()
 {
 	read_idx_ = DEFAULT_READ_INDEX;
 	write_idx_ = DEFAULT_WRITE_INDEX;
+}
+
+void Buffer::CopyFromBuffer(Buffer* buffer)
+{
+	if (buffer != nullptr)
+	{
+		Append(buffer->ReadBegin(), buffer->ReadableSize());
+	}
 }

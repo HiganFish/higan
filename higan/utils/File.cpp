@@ -3,15 +3,18 @@
 //
 #include <fcntl.h>
 
-#include "File.h"
+#include "higan/utils/File.h"
 
 using namespace higan;
 
-File::File(const std::string& file_path_):
+File::File(const std::string& file_path_, size_t cache_max_size):
 		file_stat_(),
 		file_status_(FileStatus::NOT_EXIST),
-		file_fd_(-1)
+		file_fd_(-1),
+		cache_max_size_(cache_max_size),
+		cache_buffer_()
 {
+
 	if (stat(file_path_.c_str(), &file_stat_) == 0)
 	{
 
@@ -29,6 +32,12 @@ File::File(const std::string& file_path_):
 			else
 			{
 				file_status_ = FileStatus::FILE_OPEN_SUCCESS;
+				if (TryToCacheFile())
+				{
+					file_status_ = FileStatus::FILE_CACHING;
+					close(file_fd_);
+					file_fd_ = -1;
+				}
 			}
 		}
 	}
@@ -36,7 +45,10 @@ File::File(const std::string& file_path_):
 
 File::~File()
 {
-	close(file_fd_);
+	if (file_fd_ != -1)
+	{
+		close(file_fd_);
+	}
 }
 
 size_t File::GetFileSize() const
@@ -50,11 +62,52 @@ ssize_t File::ReadFileToBuffer(Buffer* buffer)
 	{
 		return -1;
 	}
-	return buffer->ReadFromFd(file_fd_);
+
+	size_t result = -1;
+	if (file_status_ == FileStatus::FILE_OPEN_SUCCESS)
+	{
+		result = buffer->ReadFromFd(file_fd_);
+	}
+	else if (file_status_ == FileStatus::FILE_CACHING)
+	{
+		buffer->CopyFromBuffer(&cache_buffer_);
+		result = buffer->ReadableSize();
+	}
+	else
+	{
+		result = -1;
+	}
+
+	return result;
 }
 
 File::FileStatus File::GetFileStatus() const
 {
 	return file_status_;
+}
+
+bool File::TryToCacheFile()
+{
+	if (GetFileSize() <= cache_max_size_)
+	{
+		ssize_t read_size = -1;
+
+		while (true)
+		{
+			read_size = cache_buffer_.ReadFromFd(file_fd_);
+			if (read_size == 0)
+			{
+				break;
+			}
+			else if (read_size < 0)
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	return false;
 }
 

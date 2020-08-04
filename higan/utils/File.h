@@ -26,12 +26,18 @@ public:
 		// 文件非文件夹 打开成功
 		FILE_OPEN_SUCCESS,
 		// 文件非文件夹 打开失败
-		FILE_OPEN_ERROR
+		FILE_OPEN_ERROR,
+		FILE_CACHING
 	};
 
 	typedef std::shared_ptr<File> FilePtr;
 
-	explicit File(const std::string& file_path_);
+	/**
+	 * 创建文件
+	 * @param file_path_ 文件路径
+	 * @param cache_max_size 可进行缓存的最大文件大小 默认为0 不进行缓存
+	 */
+	explicit File(const std::string& file_path_, size_t cache_max_size = 0);
 	~File();
 
 	size_t GetFileSize() const;
@@ -45,12 +51,25 @@ public:
 
 	FileStatus GetFileStatus() const;
 
+
 private:
 	struct stat file_stat_;
 
 	FileStatus file_status_;
 
 	int file_fd_;
+
+	/**
+	 * 超过此大小的文件 不进行缓存 默认为0 不进行缓存
+	 */
+	size_t cache_max_size_;
+
+	Buffer cache_buffer_;
+
+	/**
+	 * 尝试缓存文件 成功返回true 失败 false
+	 */
+	bool TryToCacheFile();
 };
 }
 

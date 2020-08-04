@@ -3,11 +3,12 @@
 //
 
 #include "higan/http/HttpResponse.h"
-#include "higan/utils/File.h"
+
 
 using namespace higan;
 
-HttpResponse::HttpResponse(bool close_connection):
+HttpResponse::HttpResponse(FileCache* cache, bool close_connection):
+	file_cache_(cache),
 	body_buffer_(),
 	close_connection_(close_connection),
 	file_ptr_()
@@ -123,30 +124,34 @@ bool HttpResponse::CloseConnection() const
 
 bool HttpResponse::SetFileToResponse(const std::string& file_path)
 {
-	file_ptr_ = std::make_shared<File>(file_path);
-	bool add_result = true;
+	file_ptr_ = file_cache_->GetFilePtr(file_path);
+
+	bool add_ok_result = false;
 
 	switch (file_ptr_->GetFileStatus())
 	{
 	case File::FileStatus::NOT_EXIST:
-		add_result = false;
+		add_ok_result = false;
 		break;
 	case File::FileStatus::IS_DIR:
-		add_result = SetFileToResponse(file_path + "/index.html");
+		add_ok_result = SetFileToResponse(file_path + "/index.html");
 		break;
 	case File::FileStatus::FILE_OPEN_SUCCESS:
-		add_result = true;
+		add_ok_result = true;
 		break;
 	case File::FileStatus::FILE_OPEN_ERROR:
-		add_result = false;
+		add_ok_result = false;
+		break;
+	case File::FileStatus::FILE_CACHING:
+		add_ok_result = true;
 		break;
 	}
 
-	if (!add_result)
+	if (!add_ok_result)
 	{
 		file_ptr_.reset();
 	}
-	return add_result;
+	return add_ok_result;
 }
 
 bool HttpResponse::HasFileToResponse() const

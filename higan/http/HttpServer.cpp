@@ -9,7 +9,8 @@
 using namespace higan;
 
 HttpServer::HttpServer(EventLoop* loop, const InetAddress& addr, const std::string& server_name):
-		server_(loop, addr, server_name)
+		server_(loop, addr, server_name),
+		file_cache_("HttpCache", 0)
 {
 	server_.SetMewConnectionCallback(std::bind(&HttpServer::OnNewConnection, this, _1));
 	server_.SetMessageCallback(std::bind(&HttpServer::OnNewMessage, this, _1, _2));
@@ -64,7 +65,7 @@ void HttpServer::OnHttpRequest(const TcpConnectionPtr& connection, HttpRequest& 
 			(request.GetVersion() == HttpRequest::HTTP_VERSION_10
 			&& connection_flag != "Keep-Alive");
 
-	HttpResponse response(close_connection);
+	HttpResponse response(&file_cache_ , close_connection);
 
 	if (on_http_request_)
 	{
@@ -100,17 +101,21 @@ ssize_t HttpServer::SendFileInternal(const TcpConnectionPtr& connection, const F
 	ssize_t sum_send_size = 0;
 	Buffer send_buffer;
 
+	ssize_t result = -1;
+
 	while (true)
 	{
 		read_size = file_ptr->ReadFileToBuffer(&send_buffer);
-		if (read_size == -1)
+		if (read_size == 0)
+		{
+			result = 0;
+			break;
+		}
+		else if (read_size < 0)
 		{
 			LOG_IF(true, "read file error");
-			return -1;
-		}
-		else if(read_size == 0)
-		{
-			return 0;
+			result = -1;
+			break;
 		}
 
 		send_size = connection->Send(&send_buffer);
@@ -120,14 +125,16 @@ ssize_t HttpServer::SendFileInternal(const TcpConnectionPtr& connection, const F
 		if (send_size == -1)
 		{
 			LOG_IF(true, "send file error");
-			return -1;
+			result = -1;
+			break;
 		}
 		else if (send_size < read_size)
 		{
-			return sum_send_size;
+			result =  sum_send_size;
+			break;
 		}
 	}
-
+	return result;
 }
 
 void HttpServer::OnMessageSendOver(const TcpConnectionPtr& connection)
@@ -189,4 +196,9 @@ void HttpServer::SendFile(const TcpConnectionPtr& connection, const File::FilePt
 void HttpServer::SetThreadNum(int thread_num)
 {
 	server_.SetThreadNum(thread_num);
+}
+
+void HttpServer::SetMaxFileCacheSize(size_t cache_size)
+{
+	file_cache_.SetMaxFileSize(cache_size);
 }

@@ -33,11 +33,6 @@ bool MultiplexEpoll::LoopOnce(int timeout, MultiplexBase::ChannelList* active_ch
 
 	if (event_num > 0)
 	{
-		static int sum_event = 0;
-		sum_event += event_num;
-
-		printf("sum event: %d\r\n", sum_event);
-
 		FillActiveChannelList(event_num, active_channel_list);
 		if(static_cast<size_t>(event_num) == epoll_events_.size())
 		{

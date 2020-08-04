@@ -4,6 +4,7 @@ SET(SRCS_FILES
         Channel.cpp
         utils/Logger.cpp
         utils/File.cpp
+        utils/FileCache.cpp
         EventLoop.cpp
         Acceptor.cpp
         Socket.cpp
@@ -23,6 +24,7 @@ SET(HEADERS_FILES
         Channel.h
         utils/Logger.h
         utils/File.h
+        utils/FileCache.h
         utils/copyable.h
         utils/noncopyable.h
         EventLoop.h
