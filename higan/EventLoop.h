@@ -11,6 +11,7 @@
 
 #include "higan/multiplexing/MultiplexBase.h"
 #include "higan/base/Mutex.h"
+#include "higan/utils/Timer.h"
 
 namespace higan
 {
@@ -23,7 +24,7 @@ class EventLoop : public noncopyable
 {
 public:
 
-	typedef std::function<void()> PendingFunc;
+	typedef std::function<void()> EventLoopFunc;
 
 	EventLoop();
 	~EventLoop();
@@ -36,9 +37,12 @@ public:
 	 * 在事件循环中执行函数  当前如果正在调用事件处理函数 则延迟调用 否则立即调用
 	 * @param func
 	 */
-	void RunInLoop(const PendingFunc& func);
+	void RunInLoop(const EventLoopFunc& func);
 
 	void Quit();
+
+	void AddTimer(const Timer& timer);
+
 private:
 
 	std::unique_ptr<MultiplexBase> multiplex_base_;
@@ -47,18 +51,21 @@ private:
 	 * 就绪Channel列表
 	 */
 	MultiplexBase::ChannelList active_channel_list_;
+	std::vector<Timer> timeout_timers_;
 
 	bool handling_pending_event_;
 	bool looping_;
 	bool quit_ = false;
 
-	std::queue<PendingFunc> pending_func_queue_;
+	std::queue<EventLoopFunc> pending_func_queue_;
 
 	Mutex mutex_;
 
+	TimerManager timer_manager_;
+
 	void HandleActiveEvent();
 
-	void HandleTimeoutEvent(int timeout);
+	void HandleTimeoutEvent();
 	void CallPendingFunc();
 };
 }
