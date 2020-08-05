@@ -18,6 +18,13 @@ class Timer
 public:
 	typedef std::function<void(const Timer&)> TimerCallback;
 
+	/**
+	 * 创建定时器包装类
+	 * @param name 定时器名称
+	 * @param timeout 超时时间 单位毫秒
+	 * @param repeat 是否重复
+	 * @param callback 超时后执行的回调函数
+	 */
 	Timer(const std::string& name, int timeout, bool repeat, const TimerCallback& callback);
 	~Timer();
 

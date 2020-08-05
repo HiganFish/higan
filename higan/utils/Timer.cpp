@@ -6,13 +6,6 @@
 
 using namespace higan;
 
-/**
- * 创建一个定时器包装类
- * @param name 定时器名称
- * @param timeout 超时时间 单位毫秒
- * @param repeat 是否重复设置
- * @param callback 定时器超时后执行回调函数
- */
 Timer::Timer(const std::string& name, int timeout, bool repeat, const TimerCallback& callback):
 		name_(name),
 		expire_time_(TimeStamp::Now().GetMicroSecond()),
@@ -95,7 +88,7 @@ void TimerManager::Insert(const Timer& timer)
 
 int TimerManager::GetMinTimeout()
 {
-	return static_cast<int>(min_expire_time.GetMilliSecond() - TimeStamp::Now().GetMilliSecond());
+	return static_cast<int>(min_expire_time.GetMilliSecond() - TimeStamp::Now().GetMilliSecond() - 1);
 }
 
 int TimerManager::GetTimeoutTimer(std::vector<Timer>* timeout_timers)
