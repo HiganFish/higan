@@ -2,6 +2,7 @@
 // Created by rjd67 on 2020/7/16.
 //
 
+#include "higan/utils/Logger.h"
 #include "higan/EventLoop.h"
 #include "higan/multiplexing/MultiplexEpoll.h"
 #include "higan/Channel.h"
@@ -11,10 +12,12 @@ using namespace higan;
 EventLoop::EventLoop():
 		multiplex_base_(new MultiplexEpoll()),
 		active_channel_list_(MultiplexEpoll::EPOLL_MAX_EVNETS),
+		timeout_timers_(),
 		looping_(false),
 		quit_(false),
 		handling_pending_event_(false),
-		mutex_()
+		mutex_(),
+		timer_manager_()
 {
 
 }
@@ -38,11 +41,17 @@ void EventLoop::Loop()
 	while (!quit_)
 	{
 		active_channel_list_.clear();
+
+		/**
+		 * 从定时器队列中得到 最近定时器到现在的时间
+		 * 最小为10ms
+		 */
+		timeout = std::max(timer_manager_.GetMinTimeout(), 10);
 		bool loop_timeout = multiplex_base_->LoopOnce(timeout, &active_channel_list_);
 
 		if (loop_timeout)
 		{
-			HandleTimeoutEvent(timeout);
+			HandleTimeoutEvent();
 		}
 		else
 		{
@@ -65,14 +74,21 @@ void EventLoop::HandleActiveEvent()
 	handling_pending_event_ = false;
 }
 
-void EventLoop::HandleTimeoutEvent(int timeout)
+void EventLoop::HandleTimeoutEvent()
 {
+	timeout_timers_.clear();
+	timer_manager_.GetTimeoutTimer(&timeout_timers_);
 
+	for (const Timer& timer : timeout_timers_)
+	{
+		LOG("Timer: %s timeout", timer.GetName().c_str());
+		timer.GetTimerCallback()(timer);
+	}
 }
 
 void EventLoop::CallPendingFunc()
 {
-	std::queue<PendingFunc> pending;
+	std::queue<EventLoopFunc> pending;
 
 	{
 		/**
@@ -90,7 +106,7 @@ void EventLoop::CallPendingFunc()
 	}
 }
 
-void EventLoop::RunInLoop(const EventLoop::PendingFunc& func)
+void EventLoop::RunInLoop(const EventLoop::EventLoopFunc& func)
 {
 	{
 		MutexLockGuard guard(mutex_);
@@ -106,4 +122,9 @@ void EventLoop::UpdateChannel(Channel* channel)
 void EventLoop::Quit()
 {
 	quit_ = true;
+}
+
+void EventLoop::AddTimer(const Timer& timer)
+{
+	timer_manager_.Insert(timer);
 }

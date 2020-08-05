@@ -16,6 +16,8 @@ SET(SRCS_FILES
         utils/Codec.cpp
         EventLoopThread.cpp
         EventLoopThreadPool.cpp
+        utils/Timer.cpp
+        utils/TimeStamp.cpp
         )
 
 SET(HEADERS_FILES
@@ -38,7 +40,10 @@ SET(HEADERS_FILES
         Callback.h
         utils/Codec.h
         EventLoopThread.h
-        EventLoopThreadPool.h)
+        EventLoopThreadPool.h
+        utils/Timer.h
+        utils/TimeStamp.h
+        )
 
 add_library(higan_net ${SRCS_FILES} ${HEADERS_FILES})
 target_link_libraries(higan_net higan_base)
@@ -60,3 +65,6 @@ target_link_libraries(BufferTest higan_net)
 
 add_executable(EventLoopThreadPoolTest test/EventLoopThreadPoolTest.cpp)
 target_link_libraries(EventLoopThreadPoolTest higan_net)
+
+add_executable(TimerTest test/TimerTest.cpp)
+target_link_libraries(TimerTest higan_net)
