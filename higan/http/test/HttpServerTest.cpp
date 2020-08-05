@@ -69,7 +69,7 @@ int main()
 
 	higan::HttpServer server(&loop, address, "HttpServerTest");
 	server.SetThreadNum(3);
-	server.SetMaxFileCacheSize(10 * 1000 * 1000);
+	// server.SetMaxFileCacheSize(10 * 1000 * 1000);
 
 	g_httpserver = &server;
 

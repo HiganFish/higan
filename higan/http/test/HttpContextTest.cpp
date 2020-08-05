@@ -11,17 +11,9 @@ void TestParse(higan::HttpContext* context, const std::string& request)
 {
 	context->Reset();
 
-	size_t len = request.size();
-	ssize_t result = context->ParseRequest(request.c_str(), len);
-
-	if (result == -1)
-	{
-		printf("parse no: %d error\n", no);
-	}
-	else if (len != static_cast<size_t>(result))
-	{
-		printf("parse no: %d over\n", no);
-	}
+	higan::Buffer buffer;
+	buffer.Append(request);
+	context->ParseRequest(&buffer);
 
 	no++;
 }
