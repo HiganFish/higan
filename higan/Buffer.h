@@ -75,6 +75,7 @@ public:
 
 	void CopyFromBuffer(Buffer* buffer);
 
+	std::string ReadLine();
 private:
 
 	const static char CRLF[];

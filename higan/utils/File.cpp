@@ -4,13 +4,16 @@
 #include <fcntl.h>
 
 #include "higan/utils/File.h"
+#include "Logger.h"
 
 using namespace higan;
 
-File::File(const std::string& file_path_, size_t cache_max_size):
+File::File(const std::string& file_path, size_t cache_max_size):
+		file_path_(file_path),
 		file_stat_(),
 		file_status_(FileStatus::NOT_EXIST),
-		file_fd_(-1),
+		read_fd_(-1),
+		write_fd_(-1),
 		cache_max_size_(cache_max_size),
 		cache_buffer_()
 {
@@ -24,8 +27,8 @@ File::File(const std::string& file_path_, size_t cache_max_size):
 		}
 		else
 		{
-			file_fd_ = open(file_path_.c_str(), O_RDONLY | O_CLOEXEC);
-			if (file_fd_ == -1)
+			read_fd_ = open(file_path_.c_str(), O_RDONLY | O_CLOEXEC);
+			if (read_fd_ == -1)
 			{
 				file_status_ = FileStatus::FILE_OPEN_ERROR;
 			}
@@ -35,8 +38,8 @@ File::File(const std::string& file_path_, size_t cache_max_size):
 				if (TryToCacheFile())
 				{
 					file_status_ = FileStatus::FILE_CACHING;
-					close(file_fd_);
-					file_fd_ = -1;
+					close(read_fd_);
+					read_fd_ = -1;
 				}
 			}
 		}
@@ -45,9 +48,9 @@ File::File(const std::string& file_path_, size_t cache_max_size):
 
 File::~File()
 {
-	if (file_fd_ != -1)
+	if (read_fd_ != -1)
 	{
-		close(file_fd_);
+		close(read_fd_);
 	}
 }
 
@@ -66,7 +69,7 @@ ssize_t File::ReadFileToBuffer(Buffer* buffer)
 	size_t result = -1;
 	if (file_status_ == FileStatus::FILE_OPEN_SUCCESS)
 	{
-		result = buffer->ReadFromFd(file_fd_);
+		result = buffer->ReadFromFd(read_fd_);
 	}
 	else if (file_status_ == FileStatus::FILE_CACHING)
 	{
@@ -94,7 +97,7 @@ bool File::TryToCacheFile()
 
 		while (true)
 		{
-			read_size = cache_buffer_.ReadFromFd(file_fd_);
+			read_size = cache_buffer_.ReadFromFd(read_fd_);
 			if (read_size == 0)
 			{
 				break;
@@ -109,5 +112,43 @@ bool File::TryToCacheFile()
 	}
 
 	return false;
+}
+
+std::string File::ReadLine()
+{
+	if (ReadFileToBuffer(&cache_buffer_) == -1)
+	{
+		return "";
+	}
+
+	return cache_buffer_.ReadLine();
+}
+
+void File::Append(const std::string& data)
+{
+	Append(data.c_str(), data.length());
+}
+
+void File::Append(const char* data, size_t len)
+{
+	if (write_fd_ == -1)
+	{
+		write_fd_ = open(file_path_.c_str(), O_CREAT | O_WRONLY | O_APPEND);
+
+		if (write_fd_ == -1)
+		{
+			LOG("open file: %s for write error", file_path_.c_str());
+		}
+	}
+
+	if (write_fd_ != -1)
+	{
+		ssize_t write_result = write(write_fd_, data, len);
+
+		if (write_result < 0)
+		{
+			LOG("write to file: %s error", file_path_.c_str());
+		}
+	}
 }
 

@@ -4,6 +4,7 @@
 
 #include <sys/uio.h>
 #include <cstring>
+#include <algorithm>
 
 #include "higan/Buffer.h"
 
@@ -201,4 +202,21 @@ void Buffer::CopyFromBuffer(Buffer* buffer)
 	{
 		Append(buffer->ReadBegin(), buffer->ReadableSize());
 	}
+}
+
+std::string Buffer::ReadLine()
+{
+	std::string result;
+	const char* line_end = std::find(ReadBegin(), ReadBegin() + ReadableSize(), '\n');
+
+	if (!line_end)
+	{
+		return result;
+	}
+
+	size_t len = line_end - ReadBegin();
+	result.append(ReadBegin(), len);
+	AddReadIndex(len + 1);
+
+	return result;
 }

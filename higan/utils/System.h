@@ -27,7 +27,7 @@ public:
 	 * @param args 参数列表 如{"参数1", "参数2"}
 	 * @return shell命令返回结果
 	 */
-	static std::string RunShellCommand(std::string command, std::initializer_list<std::string> args);
+	static std::string RunShellCommand(std::string command, std::initializer_list<std::string> args = {});
 };
 }
 #endif //HIGAN_SYSTEM_H

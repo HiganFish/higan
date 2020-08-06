@@ -49,6 +49,8 @@ public:
 
 	bool CloseConnection() const;
 
+	void SetCloseConnection();
+
 	bool SetFileToResponse(const std::string& file_path);
 	bool HasFileToResponse() const;
 

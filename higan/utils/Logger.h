@@ -30,6 +30,7 @@ inline void LOG(const char* format, ...)
 	vprintf(format, args);
 	va_end(args);
 	printf("\n");
+	fflush(stdout);
 }
 
 inline void EXIT_IF(bool r, const char* format, ...)

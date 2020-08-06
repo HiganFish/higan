@@ -37,7 +37,7 @@ public:
 	 * @param file_path_ 文件路径
 	 * @param cache_max_size 可进行缓存的最大文件大小 默认为0 不进行缓存
 	 */
-	explicit File(const std::string& file_path_, size_t cache_max_size = 0);
+	explicit File(const std::string& file_path, size_t cache_max_size = 0);
 	~File();
 
 	size_t GetFileSize() const;
@@ -51,13 +51,21 @@ public:
 
 	FileStatus GetFileStatus() const;
 
+	std::string ReadLine();
+
+	void Append(const std::string& data);
+	void Append(const char* data, size_t len);
 
 private:
+
+	std::string file_path_;
+
 	struct stat file_stat_;
 
 	FileStatus file_status_;
 
-	int file_fd_;
+	int read_fd_;
+	int write_fd_;
 
 	/**
 	 * 超过此大小的文件 不进行缓存 默认为0 不进行缓存

@@ -8,7 +8,7 @@
 #include <higan/utils/System.h>
 #include <iostream>
 
-int main()
+void TestReadAndWrite()
 {
 	std::string in_file = "/tmp/c088313f-7ad5-446c-bdef-522df94cde81.txt";
 	higan::System::RunShellCommand("rm", {"-f", in_file});
@@ -46,6 +46,21 @@ int main()
 
 	close(in_fd);
 	close(out_fd);
+}
 
-	return 0;
+int main()
+{
+//	TestReadAndWrite();
+
+	higan::Buffer buffer{};
+	buffer.Append("梅2楼@A4082\n梅3楼@A4083\n梅4楼@A4084\n");
+
+	std::string result;
+
+	while (!(result = buffer.ReadLine()).empty())
+	{
+		printf("%s\n", result.c_str());
+	}
+
+	return 0 ;
 }

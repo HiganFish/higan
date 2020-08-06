@@ -163,3 +163,8 @@ const File::FilePtr& HttpResponse::GetFilePtr() const
 {
 	return file_ptr_;
 }
+
+void HttpResponse::SetCloseConnection()
+{
+	close_connection_ = true;
+}

@@ -6,8 +6,8 @@
 
 using namespace higan;
 
-const int TimeStamp::MICROSECOND_PER_SECOND = 1000000;
-const int TimeStamp::MICROSECOND_PER_MILLISECOND = 1000;
+const int64_t TimeStamp::MICROSECOND_PER_SECOND = 1000000;
+const int64_t TimeStamp::MICROSECOND_PER_MILLISECOND = 1000;
 
 
 TimeStamp::TimeStamp():

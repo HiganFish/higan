@@ -88,7 +88,14 @@ void TimerManager::Insert(const Timer& timer)
 
 int TimerManager::GetMinTimeout()
 {
-	return static_cast<int>(min_expire_time.GetMilliSecond() - TimeStamp::Now().GetMilliSecond() - 1);
+	if (timer_queue_.empty())
+	{
+		return 0;
+	}
+	else
+	{
+		return static_cast<int>(min_expire_time.GetMilliSecond() - TimeStamp::Now().GetMilliSecond() - 1);
+	}
 }
 
 int TimerManager::GetTimeoutTimer(std::vector<Timer>* timeout_timers)

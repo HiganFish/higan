@@ -16,12 +16,12 @@ public:
 	/**
 	 * 微秒每秒
 	 */
-	const static int MICROSECOND_PER_SECOND;
+	const static int64_t MICROSECOND_PER_SECOND;
 
 	/**
 	 * 微妙每毫秒
 	 */
-	const static int MICROSECOND_PER_MILLISECOND;
+	const static int64_t MICROSECOND_PER_MILLISECOND;
 
 	/**
 	 * 默认时间戳 时间为0
