@@ -68,3 +68,6 @@ target_link_libraries(EventLoopThreadPoolTest higan_net)
 
 add_executable(TimerTest test/TimerTest.cpp)
 target_link_libraries(TimerTest higan_net)
+
+add_executable(LoggerTest test/LoggerTest.cpp
+        utils/Logger.cpp utils/Logger.h utils/TimeStamp.cpp utils/TimeStamp.h)

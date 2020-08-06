@@ -9,7 +9,7 @@ int64_t g_last_time = 0;
 
 void Foo(const higan::Timer& timer)
 {
-	int64_t time = higan::TimeStamp::Now().GetMicroSecond();
+	int64_t time = higan::TimeStamp::Now();
 	LOG("Timer: %s timeout at: %ld, add: %ld", timer.GetName().c_str(),
 			time, time - g_last_time);
 
@@ -30,6 +30,6 @@ int main()
 	higan::Timer timer("TestTimer", 1000, true, Foo);
 	loop.AddTimer(timer);
 
-	LOG("Start Loop at: %ld", g_last_time = higan::TimeStamp::Now().GetMicroSecond());
+	LOG("Start Loop at: %ld", g_last_time = higan::TimeStamp::Now());
 	loop.Loop();
 }
