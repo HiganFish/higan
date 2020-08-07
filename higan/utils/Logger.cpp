@@ -3,12 +3,12 @@
 //
 
 #include <string>
-#include <unistd.h>
 #include <cstdarg>
 #include <cstring>
 #include "higan/utils/Logger.h"
 #include "higan/utils/TimeStamp.h"
 #include "higan/utils/System.h"
+#include "higan/utils/LogFile.h"
 
 using namespace higan;
 
@@ -101,6 +101,7 @@ void DefaultFlushFunction()
 Logger::OutputFunction g_output_func = DefaultOutputFunc;
 Logger::FlushFunction g_flush_func = DefaultFlushFunction;
 Logger::LogLevel g_log_level = Logger::INFO;
+std::shared_ptr<LogFile> g_log_file;
 
 void Logger::SetOutputFunction(const Logger::OutputFunction& func)
 {
@@ -110,6 +111,22 @@ void Logger::SetOutputFunction(const Logger::OutputFunction& func)
 void Logger::SetFlushFunction(const Logger::FlushFunction& func)
 {
 	g_flush_func = func;
+}
+
+void Logger::SetLogToFile(const std::string& base_name, bool thread_safe)
+{
+	g_log_file = std::make_shared<LogFile>(base_name, thread_safe);
+	SetOutputFunction(std::bind(&LogFile::Append, g_log_file,
+			std::placeholders::_1, std::placeholders::_2));
+	SetFlushFunction(std::bind(&LogFile::Flush, g_log_file));
+}
+
+void Logger::SetLogToConsole()
+{
+	if (g_log_file)
+	{
+		g_log_file.reset();
+	}
 }
 
 void Logger::SetLogLevel(Logger::LogLevel level)

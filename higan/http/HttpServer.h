@@ -54,7 +54,7 @@ private:
 	 * @param keep_connection 保持连接
 	 * @return
 	 */
-	void SendFile(const TcpConnectionPtr& connection, const File::FilePtr& file_ptr_, bool keep_connection);
+	void SendFile(const TcpConnectionPtr& connection, const FileForRead::FileForReadPtr& file_ptr_, bool keep_connection);
 
 	/**
 	 * 发送文件到指定连接

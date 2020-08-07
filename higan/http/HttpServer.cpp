@@ -171,7 +171,7 @@ void HttpServer::Stop()
 	server_.Stop();
 }
 
-void HttpServer::SendFile(const TcpConnectionPtr& connection, const File::FilePtr& file_ptr_, bool keep_connection)
+void HttpServer::SendFile(const TcpConnectionPtr& connection, const FileForRead::FileForReadPtr& file_ptr_, bool keep_connection)
 {
 	FileContext::FileContextPtr file_context_ptr = std::make_shared<FileContext>(file_ptr_,
 			keep_connection);

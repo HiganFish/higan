@@ -68,6 +68,10 @@ private:
 class FileForAppend
 {
 public:
+	/**
+	 * 创建写文件
+	 * @param url 文件完整路径
+	 */
 	explicit FileForAppend(const std::string& url);
 	~FileForAppend();
 
@@ -89,6 +93,6 @@ private:
 	size_t Write(const char* data, size_t len);
 
 	size_t write_sum_bytes_;
-}
+};
 }
 #endif //HIGAN_FILE_H

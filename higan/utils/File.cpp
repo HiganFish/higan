@@ -99,6 +99,7 @@ FileForAppend::FileForAppend(const std::string& url) :
 
 FileForAppend::~FileForAppend()
 {
+	Flush();
 	fclose(file_fp_);
 }
 

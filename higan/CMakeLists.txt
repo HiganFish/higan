@@ -17,6 +17,7 @@ SET(SRCS_FILES
         EventLoopThreadPool.cpp
         utils/Timer.cpp
         utils/TimeStamp.cpp
+        utils/LogFile.cpp
         )
 
 SET(HEADERS_FILES
@@ -41,6 +42,7 @@ SET(HEADERS_FILES
         EventLoopThreadPool.h
         utils/Timer.h
         utils/TimeStamp.h
+        utils/LogFile.h
         )
 
 add_library(higan_net ${SRCS_FILES} ${HEADERS_FILES})
