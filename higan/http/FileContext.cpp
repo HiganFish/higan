@@ -6,7 +6,7 @@
 
 using namespace higan;
 
-FileContext::FileContext(const File::FilePtr& file_ptr, bool close_connection):
+FileContext::FileContext(const FileForRead::FileForReadPtr& file_ptr, bool close_connection):
 		file_ptr_(file_ptr),
 		close_connection_(close_connection),
 		sum_read_from_cache_(0),

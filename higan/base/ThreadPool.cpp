@@ -29,7 +29,10 @@ ThreadPool::~ThreadPool()
 void ThreadPool::Init(int thread_num)
 {
 
-	EXIT_IF(running_, "ThreadPool %s is running", name_.c_str());
+	if (running_)
+	{
+		LOG_FATAL << higan::Fmt("ThreadPool %s is running", name_.c_str());
+	}
 
 	running_ = true;
 

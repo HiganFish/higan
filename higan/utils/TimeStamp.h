@@ -7,6 +7,7 @@
 
 #include <sys/time.h>
 #include <cstdint>
+#include <string>
 
 namespace higan
 {
@@ -40,17 +41,21 @@ public:
 	TimeStamp& operator-(const TimeStamp& stamp);
 
 	/**
-	 * 获取当前时间对应的时间戳
-	 * @return 获取当前时间对应的时间戳
+	 * 获取当前时间对应的微秒
+	 * @return 获取当前时间对应的微秒
 	 */
-	static TimeStamp Now();
+	static int64_t Now();
+
+	/**
+	 * 时间戳时间单位转换为微秒
+	 * @return 返回时间戳时间单位转换为微秒
+	 */
+	int64_t GetMicroSecond() const;
 
 	/**
 	 * 时间戳时间单位转换为毫秒
 	 * @return 返回时间戳时间单位转换为毫秒
 	 */
-	int64_t GetMicroSecond() const;
-
 	int64_t GetMilliSecond() const;
 
 	/**
@@ -58,6 +63,11 @@ public:
 	 * @param millisecond 单位毫秒
 	 */
 	void AddMillisecond(int millisecond);
+
+	void SetMicrosecond(int64_t microsecond);
+
+	size_t FormatToBuffer(char* buffer, size_t len) const;
+	std::string FormatToString() const;
 
 private:
 

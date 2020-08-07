@@ -28,9 +28,9 @@ void* ThreadInternalFunction(void* args)
 		return nullptr;
 	}
 
-	// LOG("Thread: %s, call start", attr->name.c_str());
+	LOG_DEBUG << higan::Fmt("Thread: %s, call start", attr->name.c_str());
 	attr->func();
-	// LOG("Thread: %s, call end", attr->name.c_str());
+	LOG_DEBUG << higan::Fmt("Thread: %s, call end", attr->name.c_str());
 
 	return nullptr;
 }
@@ -52,14 +52,17 @@ Thread::~Thread()
 	 */
 	if (started && !joined)
 	{
-		LOG("detach thread: %s", name_.c_str());
+		LOG_INFO << higan::Fmt("detach thread: %s", name_.c_str());
 		pthread_detach(thread_);
 	}
 }
 
 void Thread::Start()
 {
-	EXIT_IF(started, "Thread: %s had started", name_.c_str());
+	if (started)
+	{
+		LOG_FATAL << higan::Fmt("thread: %s had started", name_.c_str());
+	}
 
 	started = true;
 
@@ -67,20 +70,23 @@ void Thread::Start()
 
 	if (pthread_create(&thread_, nullptr, ThreadInternalFunction, static_cast<void*>(attr)) != 0)
 	{
-		LOG_IF(true, "thread: %s pthread_create error", name_.c_str());
+		LOG_FATAL << higan::Fmt("thread: %s pthread_create error", name_.c_str());
 	}
-
-	// LOG("create thread: %s", name_.c_str());
 
 }
 
 void Thread::Join()
 {
-	EXIT_IF(!started, "Thread: %s hadn't start", name_.c_str());
-	EXIT_IF(joined, "Thread: %s had joined", name_.c_str());
+	if (!started)
+	{
+		LOG_FATAL << higan::Fmt("Thread: %s hadn't start", name_.c_str());
+	}
+	if (joined)
+	{
+		LOG_FATAL << higan::Fmt("Thread: %s had joined", name_.c_str());
+	}
 
 	joined = true;
 	pthread_join(thread_, nullptr);
-	LOG("exit thread: %s", name_.c_str());
+	LOG_INFO << higan::Fmt("Thread: %s exit", name_.c_str());
 }
-

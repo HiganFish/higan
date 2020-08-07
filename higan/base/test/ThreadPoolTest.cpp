@@ -3,12 +3,12 @@
 //
 
 #include <higan/base/ThreadPool.h>
-#include <iostream>
 #include <unistd.h>
+#include <higan/utils/Logger.h>
 
 void Foo()
 {
-	std::cout << "Foo? Foo!" << std::endl;
+	LOG_INFO << "Foo? Foo!";
 
 	sleep(1);
 }

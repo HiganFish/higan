@@ -13,7 +13,7 @@
 
 namespace higan
 {
-class File
+class FileForRead
 {
 public:
 
@@ -24,21 +24,20 @@ public:
 		// 文件为文件夹
 		IS_DIR,
 		// 文件非文件夹 打开成功
-		FILE_OPEN_SUCCESS,
+		OPEN_SUCCESS,
 		// 文件非文件夹 打开失败
-		FILE_OPEN_ERROR,
-		FILE_CACHING
+		OPEN_ERROR
 	};
 
-	typedef std::shared_ptr<File> FilePtr;
+	typedef std::shared_ptr<FileForRead> FileForReadPtr;
 
 	/**
 	 * 创建文件
 	 * @param file_path_ 文件路径
-	 * @param cache_max_size 可进行缓存的最大文件大小 默认为0 不进行缓存
 	 */
-	explicit File(const std::string& file_path, size_t cache_max_size = 0);
-	~File();
+	explicit FileForRead(const std::string& file_path);
+
+	~FileForRead();
 
 	size_t GetFileSize() const;
 
@@ -53,9 +52,6 @@ public:
 
 	std::string ReadLine();
 
-	void Append(const std::string& data);
-	void Append(const char* data, size_t len);
-
 private:
 
 	std::string file_path_;
@@ -65,20 +61,38 @@ private:
 	FileStatus file_status_;
 
 	int read_fd_;
-	int write_fd_;
-
-	/**
-	 * 超过此大小的文件 不进行缓存 默认为0 不进行缓存
-	 */
-	size_t cache_max_size_;
 
 	Buffer cache_buffer_;
+};
 
+class FileForAppend
+{
+public:
 	/**
-	 * 尝试缓存文件 成功返回true 失败 false
+	 * 创建写文件
+	 * @param url 文件完整路径
 	 */
-	bool TryToCacheFile();
+	explicit FileForAppend(const std::string& url);
+	~FileForAppend();
+
+	void Append(const std::string& data);
+
+	void Append(const char* data, size_t len);
+
+	void Flush();
+
+	size_t GetWriteSumBytes() const;
+private:
+
+	std::string url_;
+
+	FILE* file_fp_;
+
+	char buffer[32 * 1024];
+
+	size_t Write(const char* data, size_t len);
+
+	size_t write_sum_bytes_;
 };
 }
-
 #endif //HIGAN_FILE_H

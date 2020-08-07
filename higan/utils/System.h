@@ -28,6 +28,8 @@ public:
 	 * @return shell命令返回结果
 	 */
 	static std::string RunShellCommand(std::string command, std::initializer_list<std::string> args = {});
+
+	static pid_t GetTid();
 };
 }
 #endif //HIGAN_SYSTEM_H

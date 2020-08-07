@@ -8,7 +8,7 @@ using namespace higan;
 
 Timer::Timer(const std::string& name, int timeout, bool repeat, const TimerCallback& callback):
 		name_(name),
-		expire_time_(TimeStamp::Now().GetMicroSecond()),
+		expire_time_(TimeStamp::Now()),
 		timeout_(timeout),
 		repeat_(repeat),
 		timer_callback_(callback)
@@ -63,7 +63,7 @@ void Timer::SetExpireTime(const TimeStamp& expire_time)
 
 void Timer::AdjustExpireTime()
 {
-	expire_time_ = TimeStamp::Now();
+	expire_time_.SetMicrosecond(TimeStamp::Now());
 	expire_time_.AddMillisecond(timeout_);
 
 }
@@ -94,7 +94,7 @@ int TimerManager::GetMinTimeout()
 	}
 	else
 	{
-		return static_cast<int>(min_expire_time.GetMilliSecond() - TimeStamp::Now().GetMilliSecond() - 1);
+		return static_cast<int>(min_expire_time.GetMilliSecond() - TimeStamp::Now() / TimeStamp::MICROSECOND_PER_MILLISECOND - 1);
 	}
 }
 

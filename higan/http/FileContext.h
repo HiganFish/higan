@@ -15,7 +15,7 @@ class FileContext
 public:
 	typedef std::shared_ptr<FileContext> FileContextPtr;
 
-	FileContext(const File::FilePtr& file_ptr, bool close_connection);
+	FileContext(const FileForRead::FileForReadPtr & file_ptr, bool close_connection);
 	~FileContext();
 
 	ssize_t ReadFileToBuffer(Buffer* buffer);
@@ -30,7 +30,7 @@ private:
 	size_t sum_read_from_cache_;
 	bool read_over_;
 
-	File::FilePtr file_ptr_;
+	FileForRead::FileForReadPtr file_ptr_;
 };
 }
 

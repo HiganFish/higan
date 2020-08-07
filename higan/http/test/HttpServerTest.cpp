@@ -1,8 +1,6 @@
 //
 // Created by rjd67 on 2020/7/25.
 //
-#include <iostream>
-
 #include <higan/http/HttpServer.h>
 #include <higan/utils/Codec.h>
 #include <csignal>
@@ -13,14 +11,13 @@ std::string web_root = "/usr/local/web/blog";
 void OnHttpRequest(const higan::TcpConnectionPtr& conn, const higan::HttpRequest& request,
 		higan::HttpResponse& response)
 {
-	std::cout << "request from: " << conn->GetConnectionName() << std::endl;
-	std::cout << request.GetMethodString() << " " << request.GetUrl() << std::endl;
+	LOG_INFO << "request from: " << conn->GetConnectionName();
+	LOG_INFO << request.GetMethodString() << " " << request.GetUrl();
 
 //	for (const auto& kv : request.GetHeaderMap())
 //	{
-//		std::cout << kv.first << ": " << kv.second << std::endl;
+//		LOG_INFO << kv.first << ": " << kv.second;
 //	}
-//	std::cout << std::endl;
 
 	response["Server"] = "higan";
 
@@ -37,12 +34,12 @@ void OnHttpRequest(const higan::TcpConnectionPtr& conn, const higan::HttpRequest
 		if (response.SetFileToResponse(file_path))
 		{
 			response.SetStatusCode(higan::HttpResponse::STATUS_200_OK);
-			LOG("send file: %s success\n\n", file_path.c_str());
+			LOG_INFO << higan::Fmt("send file: %s success\n", file_path.c_str());
 		}
 		else
 		{
 			response.SetStatusCode(higan::HttpResponse::STATUS_404_NOT_FOUND);
-			LOG("send file: %s error\n\n", file_path.c_str());
+			LOG_ERROR << higan::Fmt("send file: %s error\n", file_path.c_str());
 		}
 	}
 }

@@ -28,7 +28,7 @@ ElectricityBill::ElectricityBill(higan::EventLoop* loop, const std::string& text
 		RoomInfo room_info(flatname, roomname);
 		room_informations_.push_back(room_info);
 
-		LOG("read room: %s from file\n", room_info.GetRoomInfoString().c_str());
+		LOG_INFO << higan::Fmt("read room: %s from file", room_info.GetRoomInfoString().c_str());
 	}
 
 	higan::Timer timer{"QueryBill", 60 * 60 * 1000, true,
@@ -52,12 +52,12 @@ bool ElectricityBill::GetRoomFilePath(const std::string& request_url, std::strin
 
 	if (!GetInfoFromUrl(request_url, &room_info))
 	{
-		LOG("[GetInfoFromUrl] bad url: %s", request_url.c_str());
+		LOG_WARN << "bad url: " << request_url;
 		return false;
 	}
 	else
 	{
-		LOG("get room %s", room_info.GetRoomInfoString().c_str());
+		LOG_INFO << "get room: " << room_info.GetRoomInfoString();
 	}
 
 	auto timer_result = std::find(room_informations_.begin(), room_informations_.end(), room_info);
@@ -127,15 +127,15 @@ bool ElectricityBill::GetInfoFromUrl(const std::string& request_url, RoomInfo* r
 
 void ElectricityBill::QueryBill(const higan::Timer& timer)
 {
-	LOG("----------Query Bill Start------------");
+	LOG_INFO << "----------Query Bill Start------------";
 
 	for (const auto & room_info : room_informations_)
 	{
-		LOG("Query Result %s",
-				DoQuery(room_info).c_str());
+		LOG_INFO << "Query Result %s" <<
+				DoQuery(room_info).c_str();
 	}
 
-	LOG("----------Query Bill End------------");
+	LOG_INFO << "----------Query Bill End------------";
 }
 
 std::string ElectricityBill::DoQuery(const RoomInfo& room_info)
@@ -151,5 +151,5 @@ void ElectricityBill::AddNewRoom(const RoomInfo& room_info)
 	room_file_.Append(room_info.flatname + "\n");
 	room_file_.Append(room_info.roomname + "\n");
 
-	LOG("add new room: %s", room_info.GetRoomInfoString().c_str());
+	LOG_INFO << "add new room: %s" << room_info.GetRoomInfoString();
 }

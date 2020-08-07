@@ -81,7 +81,7 @@ void EventLoop::HandleTimeoutEvent()
 
 	for (const Timer& timer : timeout_timers_)
 	{
-		LOG("Timer: %s timeout", timer.GetName().c_str());
+		LOG_INFO << higan::Fmt("Timer: %s timeout", timer.GetName().c_str());
 		timer.GetTimerCallback()(timer);
 	}
 }
@@ -126,5 +126,7 @@ void EventLoop::Quit()
 
 void EventLoop::AddTimer(const Timer& timer)
 {
+	LOG_INFO << higan::Fmt("add new timer: %s expire: %s", timer.GetName().c_str(),
+				timer.GetExpireTime().FormatToString().c_str());
 	timer_manager_.Insert(timer);
 }

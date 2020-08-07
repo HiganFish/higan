@@ -25,7 +25,10 @@ EventLoopThreadPool::~EventLoopThreadPool()
 
 void EventLoopThreadPool::Start()
 {
-	EXIT_IF(running_, "EventLoopThreadPool %s is running", name_.c_str());
+	if (running_)
+	{
+		LOG_FATAL << higan::Fmt("EventLoopThreadPool %s is running", name_.c_str());
+	}
 
 	running_ = true;
 
@@ -38,7 +41,10 @@ void EventLoopThreadPool::Start()
 
 EventLoop* EventLoopThreadPool::GetNextEventLoop()
 {
-	EXIT_IF(!running_, "EventLoopThreadPool %s hadn't started", name_.c_str());
+	if (!running_)
+	{
+		LOG_FATAL << higan::Fmt("EventLoopThreadPool %s hadn't started", name_.c_str());
+	}
 
 	EventLoop* result = event_loops_[0];
 

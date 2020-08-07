@@ -28,7 +28,7 @@ void TcpServer::Start()
 {
 	thread_pool_.Start();
 
-	LOG("server: %s, listen on %s", server_name_.c_str(), server_addr_.GetIpPort().c_str());
+	LOG_INFO << higan::Fmt("server: %s, listen on %s", server_name_.c_str(), server_addr_.GetIpPort().c_str());
 	acceptor_.Listen();
 }
 
@@ -45,7 +45,7 @@ void TcpServer::OnNewConnection(int socket, const InetAddress& address)
 	connection_ptr->SetErrorCallback(std::bind(&TcpServer::OnConnectionError, this, _1));
 	connection_ptr->SetNewConnectionCallback(newconnection_callback_);
 
-	LOG("a new connection: %s create", connection_name.c_str());
+	LOG_INFO << higan::Fmt("a new connection: %s create", connection_name.c_str());
 	connection_map_.insert({socket, connection_ptr});
 
 	/**
@@ -80,7 +80,7 @@ void TcpServer::RemoveConnectionInLoop(const TcpConnectionPtr& connection_ptr)
 	 */
 
 	std::string connection_name = connection_ptr->GetConnectionName();
-	LOG("erase a connection %s", connection_name.c_str());
+	LOG_INFO << higan::Fmt("erase a connection %s", connection_name.c_str());
 
 	connection_map_.erase(connection_ptr->GetFd());
 

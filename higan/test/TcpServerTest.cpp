@@ -3,15 +3,16 @@
 //
 
 #include <higan/TcpServer.h>
+#include <higan/utils/Logger.h>
 
 void OnConnection(const higan::TcpConnectionPtr& conn)
 {
-	printf("---new---\n");
+	LOG_INFO << "---new---";
 }
 
 void OnMessage(const higan::TcpConnectionPtr& conn, higan::Buffer* buffer)
 {
-	printf("from %s\n%s\n", conn->GetConnectionName().c_str(), buffer->ReadAllAsString().c_str());
+	LOG_INFO << higan::Fmt("from %s\n%s\n", conn->GetConnectionName().c_str(), buffer->ReadAllAsString().c_str());
 }
 
 int main()

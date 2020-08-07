@@ -6,7 +6,7 @@
 #include <fcntl.h>
 #include <higan/Buffer.h>
 #include <higan/utils/System.h>
-#include <iostream>
+#include <higan/utils/Logger.h>
 
 void TestReadAndWrite()
 {
@@ -41,8 +41,8 @@ void TestReadAndWrite()
 		buffer.AddReadIndex(write_size);
 	}
 
-	std::cout << higan::System::RunShellCommand("md5sum", {in_file});
-	std::cout << higan::System::RunShellCommand("md5sum", {out_file});
+	LOG_INFO << higan::System::RunShellCommand("md5sum", {in_file});
+	LOG_INFO << higan::System::RunShellCommand("md5sum", {out_file});
 
 	close(in_fd);
 	close(out_fd);
@@ -59,7 +59,7 @@ int main()
 
 	while (!(result = buffer.ReadLine()).empty())
 	{
-		printf("%s\n", result.c_str());
+		LOG_INFO << result;
 	}
 
 	return 0 ;

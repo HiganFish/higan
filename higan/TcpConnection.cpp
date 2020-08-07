@@ -28,7 +28,7 @@ TcpConnection::~TcpConnection()
 
 	if (connecting_)
 	{
-		LOG("connection: %s closed by destructor", connection_name_.c_str());
+		LOG_WARN << higan::Fmt("connection: %s closed by destructor", connection_name_.c_str());
 	}
 }
 
@@ -188,7 +188,7 @@ void TcpConnection::DestroyConnection()
 	{
 		connecting_ = false;
 		channel_.DisableAll();
-		LOG("connection: %s closed", connection_name_.c_str());
+		LOG_INFO << higan::Fmt("connection: %s closed", connection_name_.c_str());
 	}
 }
 

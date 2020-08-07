@@ -33,16 +33,9 @@ public:
 
 	void SetThreadNum(int thread_num);
 
-	/**
-	 * 设置单文件的缓存判断上限
-	 * @param cache_size 大小小于此值的文件将被缓存 单位字节
-	 */
-	void SetMaxFileCacheSize(size_t cache_size);
 private:
 
 	TcpServer server_;
-
-	FileCache file_cache_;
 
 	HttpCallback on_http_request_;
 
@@ -61,7 +54,7 @@ private:
 	 * @param keep_connection 保持连接
 	 * @return
 	 */
-	void SendFile(const TcpConnectionPtr& connection, const File::FilePtr& file_ptr_, bool keep_connection);
+	void SendFile(const TcpConnectionPtr& connection, const FileForRead::FileForReadPtr& file_ptr_, bool keep_connection);
 
 	/**
 	 * 发送文件到指定连接

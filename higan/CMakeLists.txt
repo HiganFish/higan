@@ -4,7 +4,6 @@ SET(SRCS_FILES
         Channel.cpp
         utils/Logger.cpp
         utils/File.cpp
-        utils/FileCache.cpp
         EventLoop.cpp
         Acceptor.cpp
         Socket.cpp
@@ -18,6 +17,7 @@ SET(SRCS_FILES
         EventLoopThreadPool.cpp
         utils/Timer.cpp
         utils/TimeStamp.cpp
+        utils/LogFile.cpp
         )
 
 SET(HEADERS_FILES
@@ -26,7 +26,6 @@ SET(HEADERS_FILES
         Channel.h
         utils/Logger.h
         utils/File.h
-        utils/FileCache.h
         utils/copyable.h
         utils/noncopyable.h
         EventLoop.h
@@ -43,6 +42,7 @@ SET(HEADERS_FILES
         EventLoopThreadPool.h
         utils/Timer.h
         utils/TimeStamp.h
+        utils/LogFile.h
         )
 
 add_library(higan_net ${SRCS_FILES} ${HEADERS_FILES})
@@ -68,3 +68,6 @@ target_link_libraries(EventLoopThreadPoolTest higan_net)
 
 add_executable(TimerTest test/TimerTest.cpp)
 target_link_libraries(TimerTest higan_net)
+
+add_executable(LoggerTest test/LoggerTest.cpp)
+target_link_libraries(LoggerTest higan_net)
