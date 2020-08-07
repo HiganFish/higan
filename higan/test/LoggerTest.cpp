@@ -6,14 +6,13 @@
 
 int main()
 {
-	DEBUG("%s: %s", "111", "222");
+	higan::Logger::SetLogLevel(higan::Logger::DEBUG);
 
-	higan::Logger::SetLogLevel(higan::Logger::LOG_DEBUG);
+	LOG_DEBUG << higan::Fmt("%s: %s", "DEBUG", "DEBUG") << " 1";
+	LOG_INFO << higan::Fmt("%s: %s", "INFO", "INFO") << " 1";
+	LOG_WARN << higan::Fmt("%s: %s", "WARN", "WARN") << " 1";
+	LOG_ERROR << higan::Fmt("%s: %s", "ERROR", "ERROR") << " 1";
+	LOG_FATAL << higan::Fmt("%s: %s", "FATAL", "FATAL") << " 1";
 
-	DEBUG("%s: %s", "111", "222");
-	INFO("%s: %s", "111", "222");
-	WARN("%s: %s", "111", "222");
-	ERROR("%s: %s", "111", "222");
-	FATAL("%s: %s", "111", "222");
-
+	return 0;
 }

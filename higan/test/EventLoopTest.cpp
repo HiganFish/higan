@@ -4,6 +4,7 @@
 
 #include <unistd.h>
 #include <sys/time.h>
+#include <higan/utils/Logger.h>
 #include "higan/EventLoop.h"
 
 int g_looptime = 0;
@@ -15,10 +16,10 @@ void PendingFunc()
 
 	struct timeval now{};
 	gettimeofday(&now, nullptr);
-	printf("%ld:%ld\n", now.tv_sec, now.tv_usec);
+	LOG_INFO << higan::Fmt("%ld:%ld\n", now.tv_sec, now.tv_usec);
 
 	sleep(1);
-	printf("%d\n", ++g_looptime);
+	LOG_INFO << higan::Fmt("%d\n", ++g_looptime);
 
 	g_event_loop->RunInLoop(PendingFunc);
 }

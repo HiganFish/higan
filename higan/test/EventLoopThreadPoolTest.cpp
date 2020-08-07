@@ -5,6 +5,7 @@
 #include <higan/EventLoopThreadPool.h>
 #include <higan/base/Mutex.h>
 #include <unistd.h>
+#include <higan/utils/Logger.h>
 
 higan::Mutex mutex;
 
@@ -13,7 +14,7 @@ void Print()
 	higan::MutexLockGuard guard(mutex);
 
 	static int times = 0;
-	printf("nep? nep! time: %d\n", ++times);
+	LOG_INFO << higan::Fmt("nep? nep! time: %d\n", ++times);
 }
 
 int main()

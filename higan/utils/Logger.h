@@ -16,63 +16,37 @@ const static size_t G_BUFFER_DEFAULT_SIZE = 512;
 class TinyBuffer
 {
 public:
-	TinyBuffer():
-			buffer_(),
-			read_idx_(),
-			write_idx_()
-	{
+	TinyBuffer();
 
-	}
-	~TinyBuffer()
-	{
-
-	}
+	~TinyBuffer();
 
 	/**
 	 * 获取读位置指针
 	 * @return
 	 */
-	char* ReadBegin()
-	{
-		return &buffer_[read_idx_];
-	}
+	const char* ReadBegin();
 
 	/**
 	 * 获取写位置指针
 	 * @return
 	 */
-	char* WriteBegin()
-	{
-		return &buffer_[write_idx_];
-	}
+	char* WriteBegin();
 
 	/**
 	 * 向前移动读指针 最大不能超过写指针位置
 	 * @param index
 	 */
-	void AddReadIndex(size_t index)
-	{
-		read_idx_ = std::min(read_idx_ + index, write_idx_);
-	}
+	void AddReadIndex(size_t index);
 
 	/**
 	 * 向前移动写指针 最大不超过 G_BUFFER_DEFAULT_SIZE
 	 * @param index
 	 */
-	void AddWriteIndex(size_t index)
-	{
-		write_idx_ = std::min(write_idx_ + index, G_BUFFER_DEFAULT_SIZE);
-	}
+	void AddWriteIndex(size_t index);
 
-	size_t ReadableSize() const
-	{
-		return write_idx_ - read_idx_;
-	}
+	size_t ReadableSize() const;
 
-	size_t WritableSize() const
-	{
-		return G_BUFFER_DEFAULT_SIZE - write_idx_;
-	}
+	size_t WritableSize() const;
 
 private:
 	char buffer_[G_BUFFER_DEFAULT_SIZE];
@@ -80,6 +54,16 @@ private:
 	size_t read_idx_;
 
 	size_t write_idx_;
+};
+
+class Fmt
+{
+public:
+	Fmt(const char* format, ...);
+
+	const char* CStr() const;
+private:
+	char buffer_[64];
 };
 
 
@@ -92,22 +76,26 @@ public:
 
 	enum LogLevel
 	{
-		LOG_DEBUG = 0,
-		LOG_INFO = 1,
-		LOG_WARN = 2,
-		LOG_ERROR = 3,
-		LOG_FATAL = 4
+		DEBUG = 0,
+		INFO = 1,
+		WARN = 2,
+		ERROR = 3,
+		FATAL = 4
 	};
 
 	Logger(LogLevel level, const char* full_file_name, int line, const char* func_name);
 	~Logger();
 
-	void Log(const char* format, ...);
+//	void Printf(const char* format, ...);
 
 	static void SetOutputFunction(const OutputFunction& func);
 	static void SetFlushFunction(const FlushFunction& func);
 	static void SetLogLevel(LogLevel level);
 	static Logger::LogLevel GetLogLevel();
+
+	Logger& operator<<(const char* str);
+	Logger& operator<<(const Fmt& fmt);
+	Logger& operator<<(const std::string& str);
 
 private:
 
@@ -116,25 +104,46 @@ private:
 	LogLevel level_;
 };
 
-#define DEBUG(format, ...)	\
-if (higan::Logger::GetLogLevel() <= higan::Logger::LOG_DEBUG)	\
-higan::Logger(higan::Logger::LOG_DEBUG, __FILE__, __LINE__, __FUNCTION__).Log(format, __VA_ARGS__)
+/**
+ * #define LOG_DEBUG(format, ...)	\
+ * if (higan::Logger::GetLogLevel() <= higan::Logger::LOG_DEBUG)	\
+ * higan::Logger(higan::Logger::LOG_DEBUG, __FILE__, __LINE__, __FUNCTION__).Printf(format, __VA_ARGS__)
+ *
+ * 本来提供的上面样式的记录宏 然而如果只是单纯打印一条纯文本 就还要再额外定义一个宏  因为宏命令没有办法重载
+ *
+ * 本来想着不用muduo的设计样式 最终还是用了 真香.........
+ */
 
-#define INFO(format, ...)	\
-if (higan::Logger::GetLogLevel() <= higan::Logger::LOG_INFO)	\
-higan::Logger(higan::Logger::LOG_INFO, __FILE__, __LINE__, __FUNCTION__).Log(format, __VA_ARGS__)
 
-#define WARN(format, ...)	\
-if (higan::Logger::GetLogLevel() <= higan::Logger::LOG_WARN)	\
-higan::Logger(higan::Logger::LOG_WARN, __FILE__, __LINE__, __FUNCTION__).Log(format, __VA_ARGS__)
+#define LOG_DEBUG	\
+if (higan::Logger::GetLogLevel() <= higan::Logger::DEBUG)	\
+higan::Logger(higan::Logger::DEBUG, __FILE__, __LINE__, __FUNCTION__)
 
-#define ERROR(format, ...)	\
-if (higan::Logger::GetLogLevel() <= higan::Logger::LOG_ERROR)	\
-higan::Logger(higan::Logger::LOG_ERROR, __FILE__, __LINE__, __FUNCTION__).Log(format, __VA_ARGS__)
+#define LOG_INFO	\
+if (higan::Logger::GetLogLevel() <= higan::Logger::INFO)	\
+higan::Logger(higan::Logger::INFO, __FILE__, __LINE__, __FUNCTION__)
 
-#define FATAL(format, ...)	\
-if (higan::Logger::GetLogLevel() <= higan::Logger::LOG_FATAL)	\
-higan::Logger(higan::Logger::LOG_FATAL, __FILE__, __LINE__, __FUNCTION__).Log(format, __VA_ARGS__)
+#define LOG_WARN	\
+if (higan::Logger::GetLogLevel() <= higan::Logger::WARN)	\
+higan::Logger(higan::Logger::WARN, __FILE__, __LINE__, __FUNCTION__)
+
+#define LOG_ERROR	\
+if (higan::Logger::GetLogLevel() <= higan::Logger::ERROR)	\
+higan::Logger(higan::Logger::ERROR, __FILE__, __LINE__, __FUNCTION__)
+
+#define LOG_FATAL	\
+higan::Logger(higan::Logger::FATAL, __FILE__, __LINE__, __FUNCTION__)
+
+
+//#define LOG_DEBUG_P(format, ...) LOG_DEBUG.Printf(format, __VA_ARGS__);
+//
+//#define LOG_INFO_P(format, ...) LOG_INFO.Printf(format, __VA_ARGS__);
+//
+//#define LOG_WARN_P(format, ...)	LOG_WARN.Printf(format, __VA_ARGS__);
+//
+//#define LOG_ERROR_P(format, ...) LOG_ERROR.Printf(format, __VA_ARGS__);
+//
+//#define LOG_FATAL_P(format, ...) LOG_FATAL.Printf(format, __VA_ARGS__);
 
 }
 

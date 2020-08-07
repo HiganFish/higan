@@ -65,7 +65,9 @@ public:
 
 	void SetMicrosecond(int64_t microsecond);
 
-	size_t FormatToBuffer(char* buffer, size_t len);
+	size_t FormatToBuffer(char* buffer, size_t len) const;
+	std::string FormatToString() const;
+
 private:
 
 	int64_t microsecond_time_;

@@ -47,7 +47,7 @@ bool MultiplexEpoll::LoopOnce(int timeout, MultiplexBase::ChannelList* active_ch
 	{
 		if (errno != EINTR)
 		{
-			LOG_IF(true, "epoll_wait error");
+			LOG_ERROR << "epoll_wait error";
 			exit(errno);
 		}
 	}
@@ -92,12 +92,16 @@ bool MultiplexEpoll::UpdateChannelEvent(Channel* channel, int event, int option)
 	ev.data.ptr = static_cast<void*>(channel);
 	ev.events = event;
 
-	bool result = epoll_ctl(epollfd_, option, channel->GetFd(), &ev);
-	LOG_IF(result, "EPOLL_CTL_%s error, fd: %d",
-			option == EPOLL_CTL_ADD ? "ADD" :
-			option == EPOLL_CTL_DEL ? "DEL" :
-			option == EPOLL_CTL_MOD ? "MOD" : "UNKNOWN",
-			channel->GetFd());
+	int result = epoll_ctl(epollfd_, option, channel->GetFd(), &ev);
+
+	if (result == -1)
+	{
+		LOG_ERROR << higan::Fmt("EPOLL_CTL_%s error, fd: %d",
+					option == EPOLL_CTL_ADD ? "ADD" :
+					option == EPOLL_CTL_DEL ? "DEL" :
+					option == EPOLL_CTL_MOD ? "MOD" : "UNKNOWN",
+					channel->GetFd());
+	}
 
 	return result;
 }
@@ -124,7 +128,7 @@ void MultiplexEpoll::UpdateChannel(Channel* channel)
 		{
 			if (event == EPOLL_DEFAULT_EVENT)
 			{
-				LOG_IF(true, "CHANNEL_NOT_ADDED but no event");
+				LOG_WARN << "CHANNEL_NOT_ADDED but no event";
 			}
 			else
 			{

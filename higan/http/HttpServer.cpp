@@ -113,7 +113,7 @@ ssize_t HttpServer::SendFileInternal(const TcpConnectionPtr& connection, const F
 		}
 		else if (read_size < 0)
 		{
-			LOG_IF(true, "read file error");
+			LOG_ERROR << "read file error";
 			result = -1;
 			break;
 		}
@@ -124,7 +124,7 @@ ssize_t HttpServer::SendFileInternal(const TcpConnectionPtr& connection, const F
 
 		if (send_size == -1)
 		{
-			LOG_IF(true, "send file error");
+			LOG_ERROR << "send file error";
 			result = -1;
 			break;
 		}

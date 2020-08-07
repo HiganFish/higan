@@ -36,7 +36,10 @@ void Socket::Bind()
 	address_.GetSockaddr(&addr);
 	int result = bind(fd_, &addr, static_cast<socklen_t>(sizeof addr));
 
-	LOG_IF(result == -1, "bind on %s error", address_.GetIpPort().c_str());
+	if (result == -1)
+	{
+		LOG_FATAL << higan::Fmt("bind on %s error", address_.GetIpPort().c_str());
+	}
 }
 
 void Socket::SetReuseAddr()
@@ -45,7 +48,10 @@ void Socket::SetReuseAddr()
 	int result = setsockopt(fd_, SOL_SOCKET, SO_REUSEADDR, static_cast<void*>(&on),
 			static_cast<socklen_t>(sizeof on));
 
-	LOG_IF(result == -1, "set socket reuse addr error");
+	if (result == -1)
+	{
+		LOG_FATAL << "set socket reuse addr error";
+	}
 }
 
 void Socket::SetReusePort()
@@ -54,7 +60,10 @@ void Socket::SetReusePort()
 	int result = setsockopt(fd_, SOL_SOCKET, SO_REUSEPORT, static_cast<void*>(&on),
 			static_cast<socklen_t>(sizeof on));
 
-	LOG_IF(result == -1, "set socket reuse port error");
+	if (result == -1)
+	{
+		LOG_FATAL <<  "set socket reuse port error";
+	}
 }
 
 void Socket::SetKeepALive()
@@ -63,7 +72,10 @@ void Socket::SetKeepALive()
 	int result = setsockopt(fd_, SOL_SOCKET, SO_KEEPALIVE, static_cast<void*>(&on),
 			static_cast<socklen_t>(sizeof on));
 
-	LOG_IF(result == -1, "set socket reuse port error");
+	if (result == -1)
+	{
+		LOG_FATAL << "set socket reuse port error";
+	}
 }
 
 void Socket::Listen()

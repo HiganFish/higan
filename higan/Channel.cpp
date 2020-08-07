@@ -96,7 +96,7 @@ void Channel::HandleEvent()
 {
 	if (!connecting_)
 	{
-		LOG("connection: %s closed!!!!!", connection_name_.c_str());
+		LOG_ERROR << higan::Fmt("connection: %s closed!!!!!", connection_name_.c_str());
 		return;
 	}
 

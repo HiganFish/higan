@@ -137,7 +137,7 @@ void File::Append(const char* data, size_t len)
 
 		if (write_fd_ == -1)
 		{
-			LOG("open file: %s for write error", file_path_.c_str());
+			LOG_ERROR << higan::Fmt("open file: %s for write error", file_path_.c_str());
 		}
 	}
 
@@ -147,7 +147,7 @@ void File::Append(const char* data, size_t len)
 
 		if (write_result < 0)
 		{
-			LOG("write to file: %s error", file_path_.c_str());
+			LOG_ERROR << higan::Fmt("write to file: %s error", file_path_.c_str());
 		}
 	}
 }

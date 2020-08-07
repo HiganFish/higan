@@ -3,15 +3,15 @@
 //
 
 #include <higan/utils/Codec.h>
-#include <iostream>
+#include <higan/utils/Logger.h>
 
 int main()
 {
 	char url1[] = "%E7%BD%91%E7%BB%9C%E9%85%8D%E7%BD%AE";
 	char url2[] = "E7BD91EB99858DE7BDAE";
 
-	std::cout << higan::Codec::DecodeUrl(url1, strlen(url1)) << std::endl;
-	std::cout << higan::Codec::DecodeUrl(url2, strlen(url2)) << std::endl;
+	LOG_INFO << higan::Codec::DecodeUrl(url1, strlen(url1));
+	LOG_INFO << higan::Codec::DecodeUrl(url2, strlen(url2));
 
 	return 0;
 }

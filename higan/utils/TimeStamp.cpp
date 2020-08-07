@@ -4,6 +4,8 @@
 
 #include <cstdio>
 #include <ctime>
+#include <string>
+#include <cstring>
 #include "TimeStamp.h"
 
 using namespace higan;
@@ -76,14 +78,30 @@ void TimeStamp::SetMicrosecond(int64_t microsecond)
 	microsecond_time_ = microsecond;
 }
 
-size_t TimeStamp::FormatToBuffer(char* buffer, size_t len)
+
+static time_t g_last_second = 0;
+static char g_time_buffer[32];
+static size_t g_time_buffer_len;
+
+size_t TimeStamp::FormatToBuffer(char* buffer, size_t len) const
 {
 	time_t now_second = microsecond_time_ / MICROSECOND_PER_SECOND;
+	if (g_last_second != now_second)
+	{
+		struct tm* now_tm = localtime(&now_second);
+		g_time_buffer_len = strftime(g_time_buffer, sizeof g_time_buffer, "%Y-%m-%d %H:%M:%S", now_tm);
+	}
 
-	struct tm* now_tm = localtime(&now_second);
+	strcpy(buffer, g_time_buffer);
+	int s_len = snprintf(buffer + g_time_buffer_len, len - g_time_buffer_len,
+			".%06ld", microsecond_time_ % MICROSECOND_PER_SECOND);
 
-	size_t f_len = strftime(buffer, len, "%Y-%m-%d %H:%M:%S", now_tm);
-	int s_len = snprintf(buffer + f_len, len - f_len, ".%06ld", microsecond_time_ % MICROSECOND_PER_SECOND);
+	return g_time_buffer_len + s_len;
+}
 
-	return f_len + s_len;
+std::string TimeStamp::FormatToString() const
+{
+	char buffer[32];
+	FormatToBuffer(buffer, sizeof buffer);
+	return buffer;
 }
