@@ -12,7 +12,7 @@
 
 #include "higan/Channel.h"
 #include "higan/Socket.h"
-#include "higan/Buffer.h"
+#include "higan/base/Buffer.h"
 #include "higan/Callback.h"
 
 namespace higan

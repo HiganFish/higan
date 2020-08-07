@@ -4,7 +4,7 @@
 
 #include <string>
 #include <fcntl.h>
-#include <higan/Buffer.h>
+#include <higan/base/Buffer.h>
 #include <higan/utils/System.h>
 #include <higan/utils/Logger.h>
 

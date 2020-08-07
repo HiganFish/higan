@@ -2,47 +2,29 @@ SET(SRCS_FILES
         multiplexing/MultiplexBase.cpp
         multiplexing/MultiplexEpoll.cpp
         Channel.cpp
-        utils/Logger.cpp
-        utils/File.cpp
         EventLoop.cpp
         Acceptor.cpp
         Socket.cpp
         InetAddress.cpp
         TcpServer.cpp
         TcpConnection.cpp
-        Buffer.cpp
-        utils/System.cpp
-        utils/Codec.cpp
         EventLoopThread.cpp
         EventLoopThreadPool.cpp
-        utils/Timer.cpp
-        utils/TimeStamp.cpp
-        utils/LogFile.cpp
         )
 
 SET(HEADERS_FILES
         multiplexing/MultiplexBase.h
         multiplexing/MultiplexEpoll.h
         Channel.h
-        utils/Logger.h
-        utils/File.h
-        utils/copyable.h
-        utils/noncopyable.h
         EventLoop.h
         Acceptor.h
         Socket.h
         InetAddress.h
         TcpServer.h
         TcpConnection.h
-        Buffer.h
-        utils/System.h
         Callback.h
-        utils/Codec.h
         EventLoopThread.h
         EventLoopThreadPool.h
-        utils/Timer.h
-        utils/TimeStamp.h
-        utils/LogFile.h
         )
 
 add_library(higan_net ${SRCS_FILES} ${HEADERS_FILES})
@@ -60,14 +42,5 @@ target_link_libraries(EventLoopTest higan_net)
 add_executable(TcpServerTest test/TcpServerTest.cpp)
 target_link_libraries(TcpServerTest higan_net)
 
-add_executable(BufferTest test/BufferTest.cpp)
-target_link_libraries(BufferTest higan_net)
-
 add_executable(EventLoopThreadPoolTest test/EventLoopThreadPoolTest.cpp)
 target_link_libraries(EventLoopThreadPoolTest higan_net)
-
-add_executable(TimerTest test/TimerTest.cpp)
-target_link_libraries(TimerTest higan_net)
-
-add_executable(LoggerTest test/LoggerTest.cpp)
-target_link_libraries(LoggerTest higan_net)

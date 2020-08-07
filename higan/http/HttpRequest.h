@@ -8,7 +8,7 @@
 #include <string>
 #include <map>
 
-#include "higan/Buffer.h"
+#include "higan/base/Buffer.h"
 
 namespace higan
 {

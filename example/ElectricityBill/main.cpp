@@ -3,7 +3,7 @@
 //
 
 #include <higan/http/HttpServer.h>
-#include <signal.h>
+#include <csignal>
 #include <higan/utils/Logger.h>
 #include "ElectricityBill.h"
 
@@ -67,6 +67,9 @@ void OnHttpRequest(const higan::TcpConnectionPtr& conn, const higan::HttpRequest
 
 int main()
 {
+	higan::Logger::SetLogToFile(root + "/log/df", false);
+
+
 	signal(SIGPIPE, SIG_IGN);
 
 	higan::EventLoop loop;

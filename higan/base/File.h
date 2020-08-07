@@ -9,7 +9,7 @@
 #include <sys/stat.h>
 #include <memory>
 
-#include "higan/base/Buffer.h"
+#include "Buffer.h"
 
 namespace higan
 {

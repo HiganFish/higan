@@ -6,7 +6,7 @@
 #include <cstring>
 #include <algorithm>
 
-#include "higan/Buffer.h"
+#include "Buffer.h"
 
 using namespace higan;
 
