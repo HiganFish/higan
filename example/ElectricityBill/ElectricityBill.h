@@ -42,7 +42,7 @@ public:
 	ElectricityBill(higan::EventLoop* loop, const std::string& text_root);
 	~ElectricityBill();
 
-	bool GetRoomFilePath(const std::string& request_url, std::string* path);
+	bool GetRoomFilePath(const std::string& connname, const std::string& request_url, std::string* path);
 
 	void QueryBill(const higan::Timer& timer);
 
@@ -50,7 +50,7 @@ private:
 	higan::EventLoop* loop_;
 	std::string text_root_;
 
-	higan::File room_file_;
+	higan::FileForAppend room_file_;
 
 	const static std::string ROOM_MAP_FILE;
 	const static std::string SH_FILE;
@@ -58,7 +58,7 @@ private:
 
 	bool GetInfoFromUrl(const std::string& request_url, RoomInfo* room);
 
-	std::string DoQuery(const RoomInfo& room_info);
+	std::string DoQuery(const RoomInfo& room_info, const std::string& exoutput);
 
 	void AddNewRoom(const RoomInfo& room_info);
 };

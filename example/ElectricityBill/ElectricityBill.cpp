@@ -19,11 +19,13 @@ ElectricityBill::ElectricityBill(higan::EventLoop* loop, const std::string& text
 		room_file_(text_root_ + ROOM_MAP_FILE),
 		room_informations_()
 {
+	higan::FileForRead file_read(text_root + ROOM_MAP_FILE);
+
 	std::string flatname;
 	std::string roomname;
-	while (!(flatname = room_file_.ReadLine()).empty())
+	while (!(flatname = file_read.ReadLine()).empty())
 	{
-		roomname = room_file_.ReadLine();
+		roomname = file_read.ReadLine();
 
 		RoomInfo room_info(flatname, roomname);
 		room_informations_.push_back(room_info);
@@ -31,7 +33,7 @@ ElectricityBill::ElectricityBill(higan::EventLoop* loop, const std::string& text
 		LOG_INFO << higan::Fmt("read room: %s from file", room_info.GetRoomInfoString().c_str());
 	}
 
-	higan::Timer timer{"QueryBill", 60 * 60 * 1000, true,
+	higan::Timer timer{"QueryBill", 60 * 1000, true,
 					std::bind(&ElectricityBill::QueryBill, this, std::placeholders::_1)};
 	loop_->AddTimer(timer);
 
@@ -46,27 +48,28 @@ std::map<std::string, std::string> name_map{
 		{"M", "梅"}, {"Z", "竹"}, {"X", "杏"}, {"S", "松"},
 		{"T", "桃"}};
 
-bool ElectricityBill::GetRoomFilePath(const std::string& request_url, std::string* path)
+bool ElectricityBill::GetRoomFilePath(const std::string& connname, const std::string& request_url, std::string* path)
 {
 	RoomInfo room_info;
 
 	if (!GetInfoFromUrl(request_url, &room_info))
 	{
-		LOG_WARN << "bad url: " << request_url;
+		LOG_WARN << "conn: " << connname << " bad url: " << request_url;
 		return false;
 	}
 	else
 	{
-		LOG_INFO << "get room: " << room_info.GetRoomInfoString();
+		LOG_INFO << "conn: " << connname <<  " get room: " << room_info.GetRoomInfoString();
 	}
 
 	auto timer_result = std::find(room_informations_.begin(), room_informations_.end(), room_info);
 	if (timer_result == room_informations_.end())
 	{
 		AddNewRoom(room_info);
+		LOG_INFO << "conn: " << connname << " add new room: " << room_info.GetRoomInfoString();
 	}
 
-	DoQuery(room_info);
+	DoQuery(room_info, "");
 
 	*path = text_root_ + "df-" + room_info.GetRoomInfoString() + ".txt";
 
@@ -131,17 +134,17 @@ void ElectricityBill::QueryBill(const higan::Timer& timer)
 
 	for (const auto & room_info : room_informations_)
 	{
-		LOG_INFO << "Query Result %s" <<
-				DoQuery(room_info).c_str();
+		LOG_INFO << "Query Result " <<
+					DoQuery(room_info, "auto").c_str();
 	}
 
 	LOG_INFO << "----------Query Bill End------------";
 }
 
-std::string ElectricityBill::DoQuery(const RoomInfo& room_info)
+std::string ElectricityBill::DoQuery(const RoomInfo& room_info, const std::string& exoutput)
 {
 	return higan::System::RunShellCommand("sh",
-			{text_root_ + SH_FILE, room_info.flatname, room_info.roomname});
+			{text_root_ + SH_FILE, room_info.flatname, room_info.roomname, exoutput});
 }
 
 void ElectricityBill::AddNewRoom(const RoomInfo& room_info)
@@ -150,6 +153,5 @@ void ElectricityBill::AddNewRoom(const RoomInfo& room_info)
 
 	room_file_.Append(room_info.flatname + "\n");
 	room_file_.Append(room_info.roomname + "\n");
-
-	LOG_INFO << "add new room: %s" << room_info.GetRoomInfoString();
+	room_file_.Flush();
 }

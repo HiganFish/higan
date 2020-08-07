@@ -4,6 +4,7 @@
 
 #include <higan/http/HttpServer.h>
 #include <signal.h>
+#include <higan/utils/Logger.h>
 #include "ElectricityBill.h"
 
 std::string root = "/usr/local/web/df-5100/";
@@ -19,43 +20,48 @@ void OnHttpRequest(const higan::TcpConnectionPtr& conn, const higan::HttpRequest
 		return;
 	}
 
-	const std::string& url = request.GetUrl();
-
-	if (url.length() > 15)
-	{
-		response.SetStatusCode(higan::HttpResponse::STATUS_400_BAD_REQUEST);
-		response.AppendBody("为什么你的链接可以这么长?");
-		response.SetCloseConnection();
-		return;
-	}
-
-	if (url.find('?') != std::string::npos)
-	{
-		response.SetStatusCode(higan::HttpResponse::STATUS_400_BAD_REQUEST);
-		response.AppendBody("你的链接带参数了... 估计是你使用的浏览器会自动传参吧");
-		response.SetCloseConnection();
-		return;
-	}
+	std::string url = request.GetUrl();
+	LOG_INFO << higan::Fmt("connection: %s request %s", conn->GetConnectionName().c_str(),
+			url.c_str());
 
 	if (url == "/" || url == "/index.html")
 	{
 		response.SetStatusCode(higan::HttpResponse::STATUS_200_OK);
-		response.SetFileToResponse(root + "index.html");
+		response.SetFileToResponse(root + "/index.html");
+		return;
+	}
+	else if (url == "/favicon.ico")
+	{
+		response.SetStatusCode(higan::HttpResponse::STATUS_200_OK);
+		response.SetFileToResponse(root + "/favicon.ico");
+		return;
+	}
+
+	auto result = url.find('?');
+	if (result != std::string::npos)
+	{
+		url = url.substr(0, result);
+	}
+
+	if (url.length() > 8)
+	{
+		response.SetStatusCode(higan::HttpResponse::STATUS_400_BAD_REQUEST);
+		response.AppendBody("the url: " + request.GetUrl() + " is too long");
+		response.SetCloseConnection();
+		return;
+	}
+
+	std::string path;
+	if (g_bill->GetRoomFilePath(conn->GetConnectionName(), url, &path))
+	{
+		response.SetStatusCode(higan::HttpResponse::STATUS_200_OK);
+		response.SetFileToResponse(path);
 	}
 	else
 	{
-		std::string path;
-		if (g_bill->GetRoomFilePath(url, &path))
-		{
-			response.SetStatusCode(higan::HttpResponse::STATUS_200_OK);
-			response.SetFileToResponse(path);
-		}
-		else
-		{
-			response.SetStatusCode(higan::HttpResponse::STATUS_400_BAD_REQUEST);
-			response.AppendBody("不要访问一些奇奇怪怪的链接....");
-			response.CloseConnection();
-		}
+		response.SetStatusCode(higan::HttpResponse::STATUS_400_BAD_REQUEST);
+		response.AppendBody("Illegal url: " + request.GetUrl());
+		response.CloseConnection();
 	}
 }
 

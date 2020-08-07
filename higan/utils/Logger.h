@@ -63,7 +63,7 @@ public:
 
 	const char* CStr() const;
 private:
-	char buffer_[64];
+	char buffer_[256];
 };
 
 
@@ -154,5 +154,4 @@ higan::Logger(higan::Logger::FATAL, __FILE__, __LINE__, __FUNCTION__)
 //#define LOG_FATAL_P(format, ...) LOG_FATAL.Printf(format, __VA_ARGS__);
 
 }
-
-#endif //HIGAN_LOGGER_H
+#endif
