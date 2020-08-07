@@ -7,8 +7,7 @@
 
 using namespace higan;
 
-HttpResponse::HttpResponse(FileCache* cache, bool close_connection):
-	file_cache_(cache),
+HttpResponse::HttpResponse(bool close_connection):
 	body_buffer_(),
 	close_connection_(close_connection),
 	file_ptr_()
@@ -124,26 +123,23 @@ bool HttpResponse::CloseConnection() const
 
 bool HttpResponse::SetFileToResponse(const std::string& file_path)
 {
-	file_ptr_ = file_cache_->GetFilePtr(file_path);
+	file_ptr_ = std::make_shared<FileForRead>(file_path);
 
 	bool add_ok_result = false;
 
 	switch (file_ptr_->GetFileStatus())
 	{
-	case File::FileStatus::NOT_EXIST:
+	case FileForRead::FileStatus::NOT_EXIST:
 		add_ok_result = false;
 		break;
-	case File::FileStatus::IS_DIR:
+	case FileForRead::FileStatus::IS_DIR:
 		add_ok_result = SetFileToResponse(file_path + "/index.html");
 		break;
-	case File::FileStatus::FILE_OPEN_SUCCESS:
+	case FileForRead::FileStatus::OPEN_SUCCESS:
 		add_ok_result = true;
 		break;
-	case File::FileStatus::FILE_OPEN_ERROR:
+	case FileForRead::FileStatus::OPEN_ERROR:
 		add_ok_result = false;
-		break;
-	case File::FileStatus::FILE_CACHING:
-		add_ok_result = true;
 		break;
 	}
 
@@ -159,7 +155,7 @@ bool HttpResponse::HasFileToResponse() const
 	return file_ptr_ != nullptr;
 }
 
-const File::FilePtr& HttpResponse::GetFilePtr() const
+const FileForRead::FileForReadPtr & HttpResponse::GetFilePtr() const
 {
 	return file_ptr_;
 }

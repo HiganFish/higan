@@ -9,8 +9,7 @@
 using namespace higan;
 
 HttpServer::HttpServer(EventLoop* loop, const InetAddress& addr, const std::string& server_name):
-		server_(loop, addr, server_name),
-		file_cache_("HttpCache", 0)
+		server_(loop, addr, server_name)
 {
 	server_.SetMewConnectionCallback(std::bind(&HttpServer::OnNewConnection, this, _1));
 	server_.SetMessageCallback(std::bind(&HttpServer::OnNewMessage, this, _1, _2));
@@ -65,7 +64,7 @@ void HttpServer::OnHttpRequest(const TcpConnectionPtr& connection, HttpRequest& 
 			(request.GetVersion() == HttpRequest::HTTP_VERSION_10
 			&& connection_flag != "Keep-Alive");
 
-	HttpResponse response(&file_cache_ , close_connection);
+	HttpResponse response(close_connection);
 
 	if (on_http_request_)
 	{
@@ -196,9 +195,4 @@ void HttpServer::SendFile(const TcpConnectionPtr& connection, const File::FilePt
 void HttpServer::SetThreadNum(int thread_num)
 {
 	server_.SetThreadNum(thread_num);
-}
-
-void HttpServer::SetMaxFileCacheSize(size_t cache_size)
-{
-	file_cache_.SetMaxFileSize(cache_size);
 }

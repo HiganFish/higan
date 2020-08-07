@@ -2,22 +2,21 @@
 // Created by rjd67 on 2020/7/26.
 //
 #include <fcntl.h>
+#include <cassert>
+#include <cstring>
 
 #include "higan/utils/File.h"
 #include "Logger.h"
 
 using namespace higan;
 
-File::File(const std::string& file_path, size_t cache_max_size):
+FileForRead::FileForRead(const std::string& file_path):
 		file_path_(file_path),
 		file_stat_(),
 		file_status_(FileStatus::NOT_EXIST),
 		read_fd_(-1),
-		write_fd_(-1),
-		cache_max_size_(cache_max_size),
 		cache_buffer_()
 {
-
 	if (stat(file_path_.c_str(), &file_stat_) == 0)
 	{
 
@@ -30,23 +29,17 @@ File::File(const std::string& file_path, size_t cache_max_size):
 			read_fd_ = open(file_path_.c_str(), O_RDONLY | O_CLOEXEC);
 			if (read_fd_ == -1)
 			{
-				file_status_ = FileStatus::FILE_OPEN_ERROR;
+				file_status_ = FileStatus::OPEN_ERROR;
 			}
 			else
 			{
-				file_status_ = FileStatus::FILE_OPEN_SUCCESS;
-				if (TryToCacheFile())
-				{
-					file_status_ = FileStatus::FILE_CACHING;
-					close(read_fd_);
-					read_fd_ = -1;
-				}
+				file_status_ = FileStatus::OPEN_SUCCESS;
 			}
 		}
 	}
 }
 
-File::~File()
+FileForRead::~FileForRead()
 {
 	if (read_fd_ != -1)
 	{
@@ -54,12 +47,12 @@ File::~File()
 	}
 }
 
-size_t File::GetFileSize() const
+size_t FileForRead::GetFileSize() const
 {
 	return file_stat_.st_size;
 }
 
-ssize_t File::ReadFileToBuffer(Buffer* buffer)
+ssize_t FileForRead::ReadFileToBuffer(Buffer* buffer)
 {
 	if (!buffer)
 	{
@@ -67,14 +60,9 @@ ssize_t File::ReadFileToBuffer(Buffer* buffer)
 	}
 
 	size_t result = -1;
-	if (file_status_ == FileStatus::FILE_OPEN_SUCCESS)
+	if (file_status_ == FileStatus::OPEN_SUCCESS)
 	{
 		result = buffer->ReadFromFd(read_fd_);
-	}
-	else if (file_status_ == FileStatus::FILE_CACHING)
-	{
-		buffer->CopyFromBuffer(&cache_buffer_);
-		result = buffer->ReadableSize();
 	}
 	else
 	{
@@ -84,37 +72,12 @@ ssize_t File::ReadFileToBuffer(Buffer* buffer)
 	return result;
 }
 
-File::FileStatus File::GetFileStatus() const
+FileForRead::FileStatus FileForRead::GetFileStatus() const
 {
 	return file_status_;
 }
 
-bool File::TryToCacheFile()
-{
-	if (GetFileSize() <= cache_max_size_)
-	{
-		ssize_t read_size = -1;
-
-		while (true)
-		{
-			read_size = cache_buffer_.ReadFromFd(read_fd_);
-			if (read_size == 0)
-			{
-				break;
-			}
-			else if (read_size < 0)
-			{
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	return false;
-}
-
-std::string File::ReadLine()
+std::string FileForRead::ReadLine()
 {
 	if (ReadFileToBuffer(&cache_buffer_) == -1)
 	{
@@ -124,31 +87,69 @@ std::string File::ReadLine()
 	return cache_buffer_.ReadLine();
 }
 
-void File::Append(const std::string& data)
+
+FileForAppend::FileForAppend(const std::string& url) :
+		file_fp_(fopen(url.c_str(), "ae")), // a O_WRONLY | O_CREAT | O_APPEND e O_CLOEXEC
+		url_(url),
+		write_sum_bytes_(0)
+{
+	assert(file_fp_);
+	setbuffer(file_fp_, buffer, sizeof buffer);
+}
+
+FileForAppend::~FileForAppend()
+{
+	fclose(file_fp_);
+}
+
+void FileForAppend::Append(const std::string& data)
 {
 	Append(data.c_str(), data.length());
 }
 
-void File::Append(const char* data, size_t len)
+void FileForAppend::Append(const char* data, size_t len)
 {
-	if (write_fd_ == -1)
-	{
-		write_fd_ = open(file_path_.c_str(), O_CREAT | O_WRONLY | O_APPEND);
+	size_t has_writen = 0;
+	/**
+	 * 默认第一次 成功..
+	 */
+	size_t write_result = Write(data, len);
 
-		if (write_fd_ == -1)
+	has_writen += write_result;
+
+	while (has_writen < len)
+	{
+		write_result = Write(data + has_writen, len - has_writen);
+		if (write_result > 0)
 		{
-			LOG_ERROR << higan::Fmt("open file: %s for write error", file_path_.c_str());
+			has_writen += write_result;
+		}
+		else if (write_result == 0)
+		{
+			int error = ferror(file_fp_);
+			if (error)
+			{
+				fprintf(stderr, "write file %s error error msg is: %s",
+						url_.c_str(), strerror(error));
+			}
+			break;
 		}
 	}
 
-	if (write_fd_ != -1)
-	{
-		ssize_t write_result = write(write_fd_, data, len);
-
-		if (write_result < 0)
-		{
-			LOG_ERROR << higan::Fmt("write to file: %s error", file_path_.c_str());
-		}
-	}
+	write_sum_bytes_ += has_writen;
 }
 
+void FileForAppend::Flush()
+{
+	fflush(file_fp_);
+}
+
+size_t FileForAppend::Write(const char* data, size_t len)
+{
+	return fwrite_unlocked(data, 1, len, file_fp_);
+}
+
+size_t FileForAppend::GetWriteSumBytes() const
+{
+	return write_sum_bytes_;
+}
