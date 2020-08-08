@@ -13,7 +13,7 @@ int main()
 	LOG_WARN << higan::Fmt("%s: %s", "WARN", "WARN") << " 1";
 	LOG_ERROR << higan::Fmt("%s: %s", "ERROR", "ERROR") << " 1";
 
-	higan::Logger::SetLogToFile("/root/log/test", <#initializer#>, false);
+	higan::Logger::SetLogToFile("/root/log/test", "test", false);
 
 	LOG_DEBUG << higan::Fmt("%s: %s", "DEBUG", "DEBUG") << " 1";
 	LOG_INFO << higan::Fmt("%s: %s", "INFO", "INFO") << " 1";

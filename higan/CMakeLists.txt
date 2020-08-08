@@ -44,3 +44,6 @@ target_link_libraries(TcpServerTest higan_net)
 
 add_executable(EventLoopThreadPoolTest test/EventLoopThreadPoolTest.cpp)
 target_link_libraries(EventLoopThreadPoolTest higan_net)
+
+add_executable(TimerTest test/TimerTest.cpp)
+target_link_libraries(TimerTest higan_net)

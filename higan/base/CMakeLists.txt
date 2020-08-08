@@ -38,9 +38,6 @@ include_directories(${CMAKE_SOURCE_DIR})
 add_executable(ThreadTest test/ThreadPoolTest.cpp)
 target_link_libraries(ThreadTest higan_base)
 
-add_executable(TimerTest test/TimerTest.cpp)
-target_link_libraries(TimerTest higan_base)
-
 add_executable(LoggerTest test/LoggerTest.cpp)
 target_link_libraries(LoggerTest higan_base)
 
