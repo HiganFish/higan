@@ -9,7 +9,7 @@
 
 #include "higan/Socket.h"
 #include "higan/Channel.h"
-#include "higan/utils/noncopyable.h"
+#include "higan/base/noncopyable.h"
 
 namespace higan
 {

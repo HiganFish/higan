@@ -2,7 +2,7 @@
 // Created by rjd67 on 2020/8/5.
 //
 #include <higan/EventLoop.h>
-#include <higan/utils/Logger.h>
+#include <higan/base/Logger.h>
 
 higan::EventLoop* g_loop;
 int64_t g_last_time = 0;

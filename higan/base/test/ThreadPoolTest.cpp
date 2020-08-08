@@ -4,7 +4,7 @@
 
 #include <higan/base/ThreadPool.h>
 #include <unistd.h>
-#include <higan/utils/Logger.h>
+#include <higan/base/Logger.h>
 
 void Foo()
 {

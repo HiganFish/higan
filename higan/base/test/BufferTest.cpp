@@ -5,8 +5,8 @@
 #include <string>
 #include <fcntl.h>
 #include <higan/base/Buffer.h>
-#include <higan/utils/System.h>
-#include <higan/utils/Logger.h>
+#include <higan/base/System.h>
+#include <higan/base/Logger.h>
 
 void TestReadAndWrite()
 {

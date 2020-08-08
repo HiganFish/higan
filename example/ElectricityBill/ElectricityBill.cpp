@@ -4,14 +4,14 @@
 
 #include <fcntl.h>
 #include <map>
-#include <higan/utils/File.h>
-#include <higan/utils/Logger.h>
-#include <higan/utils/System.h>
+#include <higan/base/File.h>
+#include <higan/base/Logger.h>
+#include <higan/base/System.h>
 
 #include "ElectricityBill.h"
 
-const std::string ElectricityBill::ROOM_MAP_FILE = "room.txt";
-const std::string ElectricityBill::SH_FILE = "dianfei.sh";
+const std::string ElectricityBill::ROOM_MAP_FILE = "/room.txt";
+const std::string ElectricityBill::SH_FILE = "/dianfei.sh";
 
 ElectricityBill::ElectricityBill(higan::EventLoop* loop, const std::string& text_root):
 		loop_(loop),
@@ -33,7 +33,7 @@ ElectricityBill::ElectricityBill(higan::EventLoop* loop, const std::string& text
 		LOG_INFO << higan::Fmt("read room: %s from file", room_info.GetRoomInfoString().c_str());
 	}
 
-	higan::Timer timer{"QueryBill", 60 * 1000, true,
+	higan::Timer timer{"QueryBill", 60 * 60 * 1000, true,
 					std::bind(&ElectricityBill::QueryBill, this, std::placeholders::_1)};
 	loop_->AddTimer(timer);
 
@@ -71,7 +71,7 @@ bool ElectricityBill::GetRoomFilePath(const std::string& connname, const std::st
 
 	DoQuery(room_info, "");
 
-	*path = text_root_ + "df-" + room_info.GetRoomInfoString() + ".txt";
+	*path = text_root_ + "/df-" + room_info.GetRoomInfoString() + ".txt";
 
 	return true;
 }
@@ -144,7 +144,7 @@ void ElectricityBill::QueryBill(const higan::Timer& timer)
 std::string ElectricityBill::DoQuery(const RoomInfo& room_info, const std::string& exoutput)
 {
 	return higan::System::RunShellCommand("sh",
-			{text_root_ + SH_FILE, room_info.flatname, room_info.roomname, exoutput});
+			{text_root_ + SH_FILE, text_root_, room_info.flatname, room_info.roomname, exoutput});
 }
 
 void ElectricityBill::AddNewRoom(const RoomInfo& room_info)

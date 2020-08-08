@@ -20,7 +20,13 @@ public:
 	const static time_t DEFAULT_ROLL_INTERVAL;
 	const static size_t DEFAULT_MAX_FILE_SIZE;
 
-	explicit LogFile(const std::string& base_name, bool thread_safe);
+	/**
+	 * 创建日志文件管理
+	 * @param log_dir 日志文件文件夹
+	 * @param log_prefix 日志文件前缀
+	 * @param thread_safe
+	 */
+	explicit LogFile(const std::string& log_dir, const std::string& log_prefix, bool thread_safe);
 	~LogFile();
 
 	void Flush();
@@ -31,7 +37,8 @@ private:
 
 	std::unique_ptr<Mutex> mutex_;
 
-	std::string base_name_;
+	std::string log_dir_;
+	std::string log_prefix_;
 
 	time_t last_flush_time_;
 	time_t last_roll_time_;

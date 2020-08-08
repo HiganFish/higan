@@ -36,13 +36,16 @@ target_link_libraries(higan_base pthread)
 include_directories(${CMAKE_SOURCE_DIR})
 
 add_executable(ThreadTest test/ThreadPoolTest.cpp)
-target_link_libraries(ThreadTest higan_net)
+target_link_libraries(ThreadTest higan_base)
 
 add_executable(TimerTest test/TimerTest.cpp)
-target_link_libraries(TimerTest higan_net)
+target_link_libraries(TimerTest higan_base)
 
 add_executable(LoggerTest test/LoggerTest.cpp)
-target_link_libraries(LoggerTest higan_net)
+target_link_libraries(LoggerTest higan_base)
 
 add_executable(BufferTest test/BufferTest.cpp)
-target_link_libraries(BufferTest higan_net)
+target_link_libraries(BufferTest higan_base)
+
+add_executable(SystemTest test/SystemTest.cpp)
+target_link_libraries(SystemTest higan_base)

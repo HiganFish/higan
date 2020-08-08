@@ -10,7 +10,7 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 
-#include "higan/utils/copyable.h"
+#include "higan/base/copyable.h"
 
 namespace higan
 {

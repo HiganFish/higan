@@ -8,7 +8,7 @@
 #include <string>
 #include <map>
 
-#include "higan/utils/noncopyable.h"
+#include "higan/base/noncopyable.h"
 #include "higan/Acceptor.h"
 #include "higan/TcpConnection.h"
 #include "higan/EventLoopThreadPool.h"

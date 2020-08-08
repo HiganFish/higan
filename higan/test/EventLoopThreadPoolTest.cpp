@@ -5,7 +5,7 @@
 #include <higan/EventLoopThreadPool.h>
 #include <higan/base/Mutex.h>
 #include <unistd.h>
-#include <higan/utils/Logger.h>
+#include <higan/base/Logger.h>
 
 higan::Mutex mutex;
 

@@ -4,7 +4,7 @@
 
 #include "higan/http/HttpServer.h"
 
-#include "higan/utils/Logger.h"
+#include "higan/base/Logger.h"
 
 using namespace higan;
 
@@ -56,7 +56,7 @@ void HttpServer::OnNewMessage(const TcpConnectionPtr& connection, Buffer* buffer
 
 void HttpServer::OnHttpRequest(const TcpConnectionPtr& connection, HttpRequest& request)
 {
-	std::string& connection_flag = request["Connection"];
+	std::string connection_flag = request["Connection"];
 
 	// 原本的 keep_connection逻辑写起来有点麻烦 换为了跟muduo一样的判断 close
 	// 而且只有当连接为close的时候才需要进行特殊操作

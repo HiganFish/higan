@@ -7,7 +7,7 @@
 
 #include "higan/multiplexing/MultiplexEpoll.h"
 #include "higan/Channel.h"
-#include "higan/utils/Logger.h"
+#include "higan/base/Logger.h"
 
 using namespace higan;
 

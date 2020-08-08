@@ -2,8 +2,9 @@
 // Created by rjd67 on 2020/8/7.
 //
 
-#include "higan/utils/LogFile.h"
-#include "higan/utils/File.h"
+#include "higan/base/LogFile.h"
+#include "higan/base/File.h"
+#include "higan/base/System.h"
 
 #include <memory>
 #include "TimeStamp.h"
@@ -12,10 +13,11 @@ using namespace higan;
 
 const time_t LogFile::DEFAULT_FLUSH_INTERVAL = 3;
 const time_t LogFile::DEFAULT_ROLL_INTERVAL = 24 * 60 * 60;
-const size_t LogFile::DEFAULT_MAX_FILE_SIZE = 10 * 1024;
+const size_t LogFile::DEFAULT_MAX_FILE_SIZE = 10 * 1024 * 1024;
 
-LogFile::LogFile(const std::string& base_name, bool thread_safe):
-		base_name_(base_name),
+LogFile::LogFile(const std::string& log_dir, const std::string& log_prefix, bool thread_safe) :
+		log_dir_(log_dir),
+		log_prefix_(log_prefix),
 		last_flush_time_(time(nullptr)),
 		last_roll_time_(time(nullptr)),
 		file_ptr_(),
@@ -50,8 +52,13 @@ void LogFile::Append(const char* str, size_t len)
 
 void LogFile::RollFile()
 {
-	std::string file_name = GetFileName();
+	bool result = System::MakeDirIfNotExist(log_dir_, true);
+	if (!result)
+	{
+		fprintf(stderr, "create log dir failed\n");
+	}
 
+	std::string file_name = GetFileName();
 	file_ptr_ = std::make_unique<FileForAppend>(file_name);
 }
 
@@ -89,7 +96,7 @@ std::string LogFile::GetFileName()
 
 	strftime(buffer, sizeof buffer, ".%Y%m%d-%H%M%S.", tm_now);
 
-	std::string result_name = base_name_;
+	std::string result_name = log_dir_ + "/" + log_prefix_;
 	result_name.append(buffer);
 	result_name += "log";
 

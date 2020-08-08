@@ -4,10 +4,11 @@
 
 #include <higan/http/HttpServer.h>
 #include <csignal>
-#include <higan/utils/Logger.h>
+#include <higan/base/Logger.h>
+#include <higan/base/System.h>
 #include "ElectricityBill.h"
 
-std::string root = "/usr/local/web/df-5100/";
+std::string root = "";
 
 ElectricityBill* g_bill;
 
@@ -20,8 +21,14 @@ void OnHttpRequest(const higan::TcpConnectionPtr& conn, const higan::HttpRequest
 		return;
 	}
 
+	std::string conn_name = request["X-Real-IP"];
+	if (conn_name.empty())
+	{
+		conn_name = conn->GetConnectionName();
+	}
+
 	std::string url = request.GetUrl();
-	LOG_INFO << higan::Fmt("connection: %s request %s", conn->GetConnectionName().c_str(),
+	LOG_INFO << higan::Fmt("connection: %s request %s", conn_name.c_str(),
 			url.c_str());
 
 	if (url == "/" || url == "/index.html")
@@ -52,7 +59,7 @@ void OnHttpRequest(const higan::TcpConnectionPtr& conn, const higan::HttpRequest
 	}
 
 	std::string path;
-	if (g_bill->GetRoomFilePath(conn->GetConnectionName(), url, &path))
+	if (g_bill->GetRoomFilePath(conn_name, url, &path))
 	{
 		response.SetStatusCode(higan::HttpResponse::STATUS_200_OK);
 		response.SetFileToResponse(path);
@@ -65,10 +72,26 @@ void OnHttpRequest(const higan::TcpConnectionPtr& conn, const higan::HttpRequest
 	}
 }
 
-int main()
+int main(int argc, char* argv[])
 {
-	higan::Logger::SetLogToFile(root + "/log/df", false);
+	if (argc < 3)
+	{
+		printf("invalid argument number: %d\n", argc);
+		exit(-1);
+	}
+	root.append(argv[1]);
+	const char* log_path = argv[2];
 
+	if (argc >= 4)
+	{
+		if (*argv[3] == 'd')
+		{
+			printf("DaemonRun\n");
+			higan::System::DaemonRun();
+		}
+	}
+
+	higan::Logger::SetLogToFile(log_path, "df", false);
 
 	signal(SIGPIPE, SIG_IGN);
 

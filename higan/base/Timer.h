@@ -8,7 +8,7 @@
 #include <functional>
 #include <queue>
 
-#include "higan/utils/TimeStamp.h"
+#include "higan/base/TimeStamp.h"
 
 namespace higan
 {

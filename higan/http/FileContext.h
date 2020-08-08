@@ -6,7 +6,7 @@
 #define HIGAN_FILECONTEXT_H
 
 #include <memory>
-#include "higan/utils/File.h"
+#include "higan/base/File.h"
 
 namespace higan
 {

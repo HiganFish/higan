@@ -76,7 +76,7 @@ public:
 
 	void AppendBody(const char* begin, const char* end);
 
-	std::string& operator[](const std::string& key);
+	std::string operator[](const std::string& key) const;
 private:
 
 	const static char COLON[];

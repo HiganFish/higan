@@ -4,7 +4,7 @@
 
 #include "Thread.h"
 #include "higan/base/Mutex.h"
-#include "higan/utils/Logger.h"
+#include "higan/base/Logger.h"
 
 using namespace higan;
 

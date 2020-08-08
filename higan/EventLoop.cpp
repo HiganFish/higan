@@ -2,7 +2,7 @@
 // Created by rjd67 on 2020/7/16.
 //
 
-#include "higan/utils/Logger.h"
+#include "higan/base/Logger.h"
 #include "higan/EventLoop.h"
 #include "higan/multiplexing/MultiplexEpoll.h"
 #include "higan/Channel.h"

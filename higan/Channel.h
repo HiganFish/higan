@@ -7,7 +7,7 @@
 
 #include <functional>
 
-#include "higan/utils/noncopyable.h"
+#include "higan/base/noncopyable.h"
 
 namespace higan
 {

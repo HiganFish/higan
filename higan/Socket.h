@@ -6,7 +6,7 @@
 #define HIGAN_SOCKET_H
 
 #include "higan/InetAddress.h"
-#include "higan/utils/noncopyable.h"
+#include "higan/base/noncopyable.h"
 
 namespace higan
 {

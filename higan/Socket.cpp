@@ -6,7 +6,7 @@
 #include <unistd.h>
 #include <netinet/in.h>
 
-#include "higan/utils/Logger.h"
+#include "higan/base/Logger.h"
 #include "higan/Socket.h"
 
 using namespace higan;

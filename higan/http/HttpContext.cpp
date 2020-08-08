@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <cstring>
 
-#include "higan/utils/System.h"
+#include "higan/base/System.h"
 #include "higan/http/HttpContext.h"
 
 using namespace higan;

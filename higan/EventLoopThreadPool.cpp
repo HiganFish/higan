@@ -3,7 +3,7 @@
 //
 
 #include "higan/EventLoopThreadPool.h"
-#include "higan/utils/Logger.h"
+#include "higan/base/Logger.h"
 
 using namespace higan;
 

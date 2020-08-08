@@ -90,10 +90,10 @@ public:
 
 	/**
 	 * 将日志记录到 文件中
-	 * @param base_name 文件路径及前缀 如/root/test 将自动在test后 增加时间和后缀 构成文件名
+	 * @param log_dir 文件路径及前缀 如/root/test 将自动在test后 增加时间和后缀 构成文件名
 	 * @param thread_safe false 不使用线程安全机制
 	 */
-	static void SetLogToFile(const std::string& base_name, bool thread_safe);
+	static void SetLogToFile(const std::string& log_dir, const std::string& log_prefix, bool thread_safe);
 	static void SetLogToConsole();
 
 	static void SetOutputFunction(const OutputFunction& func);

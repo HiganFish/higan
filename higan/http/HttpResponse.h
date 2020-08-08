@@ -8,7 +8,7 @@
 #include <string>
 
 #include "higan/http/HttpRequest.h"
-#include "higan/utils/File.h"
+#include "higan/base/File.h"
 
 namespace higan
 {

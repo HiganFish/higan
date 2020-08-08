@@ -3,7 +3,7 @@
 //
 
 #include "higan/Channel.h"
-#include "higan/utils/Logger.h"
+#include "higan/base/Logger.h"
 #include "higan/EventLoop.h"
 
 using namespace higan;

@@ -30,6 +30,16 @@ public:
 	static std::string RunShellCommand(std::string command, std::initializer_list<std::string> args = {});
 
 	static pid_t GetTid();
+
+	/**
+	 * 创建文件夹
+	 * @param dir_path 文件夹路径
+	 * @param loop_create 父目录不存在时 循环创建
+	 * @return true for 文件夹创建成功
+	 */
+	static bool MakeDirIfNotExist(const std::string& dir_path, bool loop_create = false);
+
+	static void DaemonRun();
 };
 }
 #endif //HIGAN_SYSTEM_H

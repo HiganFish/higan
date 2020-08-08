@@ -6,7 +6,7 @@
 #include <algorithm>
 
 #include "higan/http/HttpRequest.h"
-#include "higan/utils/Codec.h"
+#include "higan/base/Codec.h"
 
 using namespace higan;
 
@@ -117,9 +117,14 @@ HttpRequest::HttpVersion HttpRequest::GetVersion() const
 	return version_;
 }
 
-std::string& HttpRequest::operator[](const std::string& key)
+std::string HttpRequest::operator[](const std::string& key) const
 {
-	return headers_[key];
+	auto result = headers_.find(key);
+	if (result != headers_.end())
+	{
+		return result->second;
+	}
+	return "";
 }
 
 std::string HttpRequest::GetMethodString() const

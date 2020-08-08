@@ -2,8 +2,8 @@
 // Created by rjd67 on 2020/7/29.
 //
 
-#include <higan/utils/Codec.h>
-#include <higan/utils/Logger.h>
+#include <higan/base/Codec.h>
+#include <higan/base/Logger.h>
 
 int main()
 {

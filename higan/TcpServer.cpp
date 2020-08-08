@@ -3,7 +3,7 @@
 //
 
 #include "higan/TcpServer.h"
-#include "higan/utils/Logger.h"
+#include "higan/base/Logger.h"
 
 using namespace higan;
 

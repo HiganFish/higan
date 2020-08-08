@@ -11,7 +11,7 @@
 
 #include "higan/multiplexing/MultiplexBase.h"
 #include "higan/base/Mutex.h"
-#include "higan/utils/Timer.h"
+#include "higan/base/Timer.h"
 
 namespace higan
 {
