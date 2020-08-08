@@ -59,9 +59,12 @@ void OnHttpRequest(const higan::TcpConnectionPtr& conn, const higan::HttpRequest
 	}
 
 	std::string path;
-	if (g_bill->GetRoomFilePath(conn_name, url, &path))
+	std::string query_result;
+	if (g_bill->GetRoomInfoFromUrl(conn_name, url, &path, &query_result))
 	{
 		response.SetStatusCode(higan::HttpResponse::STATUS_200_OK);
+		response.AppendBody("now: " + query_result + "\n");
+		response.AppendBody("--------------------Results of regular query-----------------\n");
 		response.SetFileToResponse(path);
 	}
 	else
@@ -82,16 +85,38 @@ int main(int argc, char* argv[])
 	root.append(argv[1]);
 	const char* log_path = argv[2];
 
+	bool daemon = false;
+	bool log_to_file = false;
 	if (argc >= 4)
 	{
-		if (*argv[3] == 'd')
+		std::string ex_arg = argv[3];
+		for (const char c : ex_arg)
 		{
-			printf("DaemonRun\n");
-			higan::System::DaemonRun();
+			if (c == 'd')
+			{
+				daemon = true;
+			}
+			else if (c == 'f')
+			{
+				log_to_file = true;
+			}
+			else
+			{
+				printf("unknown argument: %s\n", argv[3]);
+				exit(0);
+			}
 		}
 	}
 
-	higan::Logger::SetLogToFile(log_path, "df", false);
+	if (daemon)
+	{
+		printf("daemon run");
+		higan::System::DaemonRun();
+	}
+	if (log_to_file)
+	{
+		higan::Logger::SetLogToFile(log_path, "df", false);
+	}
 
 	signal(SIGPIPE, SIG_IGN);
 

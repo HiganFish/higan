@@ -49,15 +49,12 @@ void HttpResponse::EncodeToBuffer(Buffer* buffer)
 		buffer->Append("Connection: Keep-Alive\r\n");
 	}
 
-	size_t body_size = -1;
+	size_t body_size = body_buffer_.ReadableSize();
 	if (file_ptr_)
 	{
-		body_size= file_ptr_->GetFileSize();
+		body_size += file_ptr_->GetFileSize();
 	}
-	else
-	{
-		body_size = body_buffer_.ReadableSize();
-	}
+
 	len = snprintf(line_buff, sizeof line_buff, "Content-Length: %zd\r\n", body_size);
 	buffer->Append(line_buff, len);
 
@@ -72,7 +69,8 @@ void HttpResponse::EncodeToBuffer(Buffer* buffer)
 
 	buffer->AppendCRLF();
 
-	if (!file_ptr_)
+	buffer->Append(&body_buffer_);
+	if (file_ptr_)
 	{
 		buffer->Append(&body_buffer_);
 	}

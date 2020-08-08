@@ -48,7 +48,8 @@ std::map<std::string, std::string> name_map{
 		{"M", "梅"}, {"Z", "竹"}, {"X", "杏"}, {"S", "松"},
 		{"T", "桃"}};
 
-bool ElectricityBill::GetRoomFilePath(const std::string& connname, const std::string& request_url, std::string* path)
+bool ElectricityBill::GetRoomInfoFromUrl(const std::string& connname, const std::string& request_url, std::string* path,
+		std::string* query_request)
 {
 	RoomInfo room_info;
 
@@ -69,9 +70,8 @@ bool ElectricityBill::GetRoomFilePath(const std::string& connname, const std::st
 		LOG_INFO << "conn: " << connname << " add new room: " << room_info.GetRoomInfoString();
 	}
 
-	DoQuery(room_info, "");
-
-	*path = text_root_ + "/df-" + room_info.GetRoomInfoString() + ".txt";
+	*query_request = DoQuery(room_info);
+	*path = GetRoomFilePathInternal(room_info);
 
 	return true;
 }
@@ -124,7 +124,6 @@ bool ElectricityBill::GetInfoFromUrl(const std::string& request_url, RoomInfo* r
 			room_info->roomname += request_url[i];
 		}
 	}
-
 	return true;
 }
 
@@ -134,17 +133,22 @@ void ElectricityBill::QueryBill(const higan::Timer& timer)
 
 	for (const auto & room_info : room_informations_)
 	{
-		LOG_INFO << "Query Result " <<
-					DoQuery(room_info, "auto").c_str();
+		std::string room_file_path = GetRoomFilePathInternal(room_info);
+
+		higan::FileForAppend file(room_file_path);
+		std::string result =  DoQuery(room_info);
+
+		file.Append(result + '\n');
+		LOG_INFO << "Query Result: " << room_info.GetRoomInfoString() << " " << result;
 	}
 
 	LOG_INFO << "----------Query Bill End------------";
 }
 
-std::string ElectricityBill::DoQuery(const RoomInfo& room_info, const std::string& exoutput)
+std::string ElectricityBill::DoQuery(const RoomInfo& room_info)
 {
 	return higan::System::RunShellCommand("sh",
-			{text_root_ + SH_FILE, text_root_, room_info.flatname, room_info.roomname, exoutput});
+			{text_root_ + SH_FILE, room_info.flatname, room_info.roomname});
 }
 
 void ElectricityBill::AddNewRoom(const RoomInfo& room_info)
@@ -154,4 +158,9 @@ void ElectricityBill::AddNewRoom(const RoomInfo& room_info)
 	room_file_.Append(room_info.flatname + "\n");
 	room_file_.Append(room_info.roomname + "\n");
 	room_file_.Flush();
+}
+
+std::string ElectricityBill::GetRoomFilePathInternal(const RoomInfo& room_info)
+{
+	return text_root_ + "/df-" + room_info.GetRoomInfoString();
 }
