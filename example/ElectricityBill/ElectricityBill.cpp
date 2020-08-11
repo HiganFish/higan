@@ -44,10 +44,6 @@ ElectricityBill::~ElectricityBill()
 
 }
 
-std::map<std::string, std::string> name_map{
-		{"M", "梅"}, {"Z", "竹"}, {"X", "杏"}, {"S", "松"},
-		{"T", "桃"}};
-
 bool ElectricityBill::GetRoomInfoFromUrl(const std::string& connname, const std::string& request_url, std::string* path,
 		std::string* query_request)
 {
@@ -75,6 +71,10 @@ bool ElectricityBill::GetRoomInfoFromUrl(const std::string& connname, const std:
 
 	return true;
 }
+
+std::map<std::string, std::string> name_map{
+		{"M", "梅"}, {"Z", "竹"}, {"X", "杏"}, {"S", "松"},
+		{"T", "桃"}, {"Y", "研"}};
 
 bool ElectricityBill::GetInfoFromUrl(const std::string& request_url, RoomInfo* room_info)
 {

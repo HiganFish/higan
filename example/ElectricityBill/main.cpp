@@ -63,7 +63,7 @@ void OnHttpRequest(const higan::TcpConnectionPtr& conn, const higan::HttpRequest
 	if (g_bill->GetRoomInfoFromUrl(conn_name, url, &path, &query_result))
 	{
 		response.SetStatusCode(higan::HttpResponse::STATUS_200_OK);
-		response.AppendBody("重要更新: 现在你手动查询的结果并不会记录下来 而是显示在所有结果最上方 系统只记录每小时的定时查询\n");
+		response.AppendBody("update time: 2020-8-10 info: http://df.lsmg.xyz\n");
 		response.AppendBody("now: " + query_result + "\n");
 		response.AppendBody("--------------------Results of regular query-----------------\n");
 		response.SetFileToResponse(path);
