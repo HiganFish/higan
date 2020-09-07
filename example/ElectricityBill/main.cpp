@@ -8,7 +8,7 @@
 #include <higan/base/System.h>
 #include "ElectricityBill.h"
 
-std::string root = "";
+std::string web_root = "";
 
 ElectricityBill* g_bill;
 
@@ -34,13 +34,13 @@ void OnHttpRequest(const higan::TcpConnectionPtr& conn, const higan::HttpRequest
 	if (url == "/" || url == "/index.html")
 	{
 		response.SetStatusCode(higan::HttpResponse::STATUS_200_OK);
-		response.SetFileToResponse(root + "/index.html");
+		response.SetFileToResponse(web_root + "/index.html");
 		return;
 	}
 	else if (url == "/favicon.ico")
 	{
 		response.SetStatusCode(higan::HttpResponse::STATUS_200_OK);
-		response.SetFileToResponse(root + "/favicon.ico");
+		response.SetFileToResponse(web_root + "/favicon.ico");
 		return;
 	}
 
@@ -63,9 +63,21 @@ void OnHttpRequest(const higan::TcpConnectionPtr& conn, const higan::HttpRequest
 	if (g_bill->GetRoomInfoFromUrl(conn_name, url, &path, &query_result))
 	{
 		response.SetStatusCode(higan::HttpResponse::STATUS_200_OK);
-		response.AppendBody("update time: 2020-8-10 info: http://df.lsmg.xyz\n");
-		response.AppendBody("now: " + query_result + "\n");
-		response.AppendBody("--------------------Results of regular query-----------------\n");
+
+		response.AppendBody("<!DOCTYPE html>"
+							"<html>"
+							"<head>"
+							"<meta charset=\"utf-8\">"
+							"<title>（（（呐）））</title>"
+							"</head>"
+							"<body>"
+	   						"<div style=\"white-space:pre-line\">"
+							"<p>网站更新时间 2020-9-6</p>"
+	   						"<p>更新内容\n1. 更好的UI ?</p>"
+		  					"<hr>");
+		response.AppendBody("本次访问查询结果: \n" + query_result + "\n<hr>");
+		response.AppendBody("以下是系统自动查询记录\n");
+		response.AppendBody("<small>");
 		response.SetFileToResponse(path);
 	}
 	else
@@ -78,34 +90,33 @@ void OnHttpRequest(const higan::TcpConnectionPtr& conn, const higan::HttpRequest
 
 int main(int argc, char* argv[])
 {
-	if (argc < 3)
-	{
-		printf("invalid argument number: %d\n", argc);
-		exit(-1);
-	}
-	root.append(argv[1]);
-	const char* log_path = argv[2];
-
 	bool daemon = false;
 	bool log_to_file = false;
-	if (argc >= 4)
+	std::string log_path;
+
+	int opt = -1;
+	while ((opt = getopt(argc, argv, "w:l:d")) != -1)
 	{
-		std::string ex_arg = argv[3];
-		for (const char c : ex_arg)
+		switch (opt)
 		{
-			if (c == 'd')
+			case 'w':
 			{
-				daemon = true;
+				web_root = optarg;
+				break;
 			}
-			else if (c == 'f')
+			case 'l':
 			{
 				log_to_file = true;
+				log_path = optarg;
+				break;
 			}
-			else
+			case 'd':
 			{
-				printf("unknown argument: %s\n", argv[3]);
-				exit(0);
+				daemon = true;
+				break;
 			}
+			default:
+				break;
 		}
 	}
 
@@ -123,7 +134,7 @@ int main(int argc, char* argv[])
 
 	higan::EventLoop loop;
 
-	ElectricityBill bill(&loop, root);
+	ElectricityBill bill(&loop, web_root);
 	g_bill = &bill;
 
 	higan::InetAddress address{4000};

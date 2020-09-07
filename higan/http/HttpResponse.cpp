@@ -95,18 +95,18 @@ std::string HttpResponse::StatusCodeToString(HttpResponse::StatusCode status_cod
 	std::string result = "500 Internal Server Error";
 	switch (status_code)
 	{
-	case STATUS_200_OK:
-		result = "200 OK";
-		break;
-	case STATUS_400_BAD_REQUEST:
-		result = "400 Bad Request";
-		break;
-	case STATUS_404_NOT_FOUND:
-		result = "404 Not Found";
-		break;
-	case STATUS_500_SERVICE_ERROR:
-		result = "500 Internal Server Error";
-		break;
+		case STATUS_200_OK:
+			result = "200 OK";
+			break;
+		case STATUS_400_BAD_REQUEST:
+			result = "400 Bad Request";
+			break;
+		case STATUS_404_NOT_FOUND:
+			result = "404 Not Found";
+			break;
+		case STATUS_500_SERVICE_ERROR:
+			result = "500 Internal Server Error";
+			break;
 	}
 
 	return result;
@@ -127,18 +127,18 @@ bool HttpResponse::SetFileToResponse(const std::string& file_path)
 
 	switch (file_ptr_->GetFileStatus())
 	{
-	case FileForRead::FileStatus::NOT_EXIST:
-		add_ok_result = false;
-		break;
-	case FileForRead::FileStatus::IS_DIR:
-		add_ok_result = SetFileToResponse(file_path + "/index.html");
-		break;
-	case FileForRead::FileStatus::OPEN_SUCCESS:
-		add_ok_result = true;
-		break;
-	case FileForRead::FileStatus::OPEN_ERROR:
-		add_ok_result = false;
-		break;
+		case FileForRead::FileStatus::NOT_EXIST:
+			add_ok_result = false;
+			break;
+		case FileForRead::FileStatus::IS_DIR:
+			add_ok_result = SetFileToResponse(file_path + "/index.html");
+			break;
+		case FileForRead::FileStatus::OPEN_SUCCESS:
+			add_ok_result = true;
+			break;
+		case FileForRead::FileStatus::OPEN_ERROR:
+			add_ok_result = false;
+			break;
 	}
 
 	if (!add_ok_result)

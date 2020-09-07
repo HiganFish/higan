@@ -132,21 +132,21 @@ std::string HttpRequest::GetMethodString() const
 	std::string result = "ERROR";
 	switch (method_)
 	{
-	case HTTP_REQUEST_UNKNOWN:
-		result = "UNKNOWN";
-		break;
-	case HTTP_REQUEST_GET:
-		result = "GET";
-		break;
-	case HTTP_REQUEST_POST:
-		result = "POST";
-		break;
-	case HTTP_REQUEST_PUT:
-		result = "PUT";
-		break;
-	case HTTP_REQUEST_DELETE:
-		result = "DELETE";
-		break;
+		case HTTP_REQUEST_UNKNOWN:
+			result = "UNKNOWN";
+			break;
+		case HTTP_REQUEST_GET:
+			result = "GET";
+			break;
+		case HTTP_REQUEST_POST:
+			result = "POST";
+			break;
+		case HTTP_REQUEST_PUT:
+			result = "PUT";
+			break;
+		case HTTP_REQUEST_DELETE:
+			result = "DELETE";
+			break;
 	}
 
 	return result;
