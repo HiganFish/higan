@@ -10,9 +10,9 @@ using namespace higan;
 TcpServer::TcpServer(EventLoop* loop, const InetAddress& addr, const std::string& server_name):
 		loop_(loop),
 		thread_pool_(server_name + "Pool", loop),
-		acceptor_(loop_, addr),
-		server_addr_(addr),
 		server_name_(server_name),
+		server_addr_(addr),
+		acceptor_(loop_, addr),
 		connection_map_()
 {
 	acceptor_.SetNewConnectionCallback(std::bind(&TcpServer::OnNewConnection,

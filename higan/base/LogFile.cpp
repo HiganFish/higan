@@ -16,12 +16,12 @@ const time_t LogFile::DEFAULT_ROLL_INTERVAL = 24 * 60 * 60;
 const size_t LogFile::DEFAULT_MAX_FILE_SIZE = 10 * 1024 * 1024;
 
 LogFile::LogFile(const std::string& log_dir, const std::string& log_prefix, bool thread_safe) :
+		mutex_(thread_safe ? std::make_unique<Mutex>() : nullptr),
 		log_dir_(log_dir),
 		log_prefix_(log_prefix),
 		last_flush_time_(time(nullptr)),
 		last_roll_time_(time(nullptr)),
-		file_ptr_(),
-		mutex_(thread_safe ? std::make_unique<Mutex>() : nullptr)
+		file_ptr_(nullptr)
 {
 	RollFile();
 }

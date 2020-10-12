@@ -13,9 +13,9 @@ EventLoop::EventLoop():
 		multiplex_base_(new MultiplexEpoll()),
 		active_channel_list_(MultiplexEpoll::EPOLL_MAX_EVNETS),
 		timeout_timers_(),
+		handling_pending_event_(false),
 		looping_(false),
 		quit_(false),
-		handling_pending_event_(false),
 		mutex_(),
 		timer_manager_()
 {

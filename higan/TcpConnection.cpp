@@ -136,7 +136,7 @@ ssize_t TcpConnection::Send(const char* data, size_t len)
 	{
 		return -1;
 	}
-	else if (send_size < len)
+	else if (static_cast<size_t>(send_size) < len)
 	{
 		output_buffer_.Append(data + send_size, len - static_cast<size_t>(send_size));
 		channel_.EnableWritable();

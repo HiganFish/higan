@@ -1,10 +1,7 @@
-cmake_minimum_required(VERSION 3.1.3)
+cmake_minimum_required(VERSION 2.8.12)
 project(higan)
 
-set(CMAKE_CXX_STANDARD 17)
-
-SET(CMAKE_CXX_FLAGS
-    -g
+SET(CMAKE_CXX_FLAGS "-g -std=c++17 -lstdc++ -Wall"
 )
 
 add_subdirectory(higan)

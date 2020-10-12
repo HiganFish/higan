@@ -7,6 +7,7 @@
 
 #include <cstdio>
 #include <functional>
+#include <string>
 
 namespace higan
 {

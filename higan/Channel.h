@@ -6,7 +6,7 @@
 #define _CHANNEL_H_
 
 #include <functional>
-
+#include <string>
 #include "higan/base/noncopyable.h"
 
 namespace higan

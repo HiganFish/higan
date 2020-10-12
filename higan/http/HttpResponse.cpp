@@ -8,8 +8,8 @@
 using namespace higan;
 
 HttpResponse::HttpResponse(bool close_connection):
-	body_buffer_(),
 	close_connection_(close_connection),
+	body_buffer_(),
 	file_ptr_()
 {
 }

@@ -7,6 +7,7 @@
 
 #include <ctime>
 #include <memory>
+#include <string>
 #include "higan/base/Mutex.h"
 
 namespace higan

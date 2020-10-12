@@ -89,8 +89,8 @@ std::string FileForRead::ReadLine()
 
 
 FileForAppend::FileForAppend(const std::string& url) :
-		file_fp_(fopen(url.c_str(), "ae")), // a O_WRONLY | O_CREAT | O_APPEND e O_CLOEXEC
 		url_(url),
+		file_fp_(fopen(url.c_str(), "ae")), // a O_WRONLY | O_CREAT | O_APPEND e O_CLOEXEC
 		write_sum_bytes_(0)
 {
 	assert(file_fp_);

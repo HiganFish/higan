@@ -55,7 +55,7 @@ ssize_t Buffer::ReadFromFd(int fd)
 	{
 		return -1;
 	}
-	else if (read_size <= WritableSize())
+	else if (static_cast<size_t>(read_size) <= WritableSize())
 	{
 		AddWriteIndex(read_size);
 	}
@@ -75,7 +75,7 @@ ssize_t Buffer::ReadFromFd(int fd)
 void Buffer::CopyExDataToBuffer(const char* exbuffer, size_t ex_len)
 {
 
-	ssize_t drop_len = read_idx_ - DEFAULT_READ_INDEX;
+	size_t drop_len = read_idx_ - DEFAULT_READ_INDEX;
 	/**
 	 * 可以将已读的内容丢弃来 从远buffer_中得到足够的空间
 	 * 无法得到则扩容
