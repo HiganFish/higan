@@ -1,8 +1,8 @@
 //
 // Created by rjd67 on 2020/10/14.
-//
-
 #ifndef HIGAN_SINGLETON_H
+
+//
 #define HIGAN_SINGLETON_H
 
 #include <pthread.h>
