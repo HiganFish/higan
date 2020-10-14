@@ -28,7 +28,7 @@ SET(HEADERS_FILES
         System.h
         Codec.h
         Buffer.h
-)
+        Singleton.h)
 
 add_library(higan_base ${SRCS_FILES} ${HEADERS_FILES})
 target_link_libraries(higan_base pthread)
@@ -46,3 +46,6 @@ target_link_libraries(BufferTest higan_base)
 
 add_executable(SystemTest test/SystemTest.cpp)
 target_link_libraries(SystemTest higan_base)
+
+add_executable(SingletonTest test/SingletonTest.cpp)
+target_link_libraries(SingletonTest higan_base)
