@@ -39,14 +39,20 @@ class LoginResultPackage : public NetworkPackageBase
 public:
 	LoginResultPackage();
 
-	ssize_t SerializeToBuffer(uint8_t* buffer, size_t BufferLen) override;
+	LoginResultPackage(ELoginResult result, uint32_t user_key);
+
+	ssize_t SerializeToBuffer(uint8_t* buffer, size_t buffer_len) override;
 
 	ssize_t DeSerializeFromBuffer(const uint8_t* buffer, size_t buffer_len) override;
+
+	ELoginResult GetLoginResult() const;
+
+	uint32_t GetUserId() const;
 
 private:
 
 	ELoginResult login_result_;
-	std::string user_key_;
+	uint32_t user_id_;
 };
 
 #endif //HIGAN_LOGINNETWORKPACKAGE_H

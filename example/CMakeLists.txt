@@ -1,1 +1,3 @@
 add_subdirectory(ElectricityBill)
+
+add_subdirectory(GameComponent)

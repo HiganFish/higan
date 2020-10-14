@@ -5,8 +5,9 @@
 #include <higan/InetAddress.cpp>
 #include <higan/TcpServer.h>
 #include <higan/base/Logger.h>
+#include <higan/base/Singleton.h>
 
-#include "LoginNetworkPackage.h"
+#include "UserManager.h"
 
 void OnMessage(const TcpConnectionPtr& connection_ptr, Buffer* buffer)
 {
@@ -28,8 +29,32 @@ void OnMessage(const TcpConnectionPtr& connection_ptr, Buffer* buffer)
 	}
 	buffer->AddReadIndex(static_cast<size_t>(parsed_len));
 
-	LOG_INFO << connection_ptr->GetConnectionName() << " authentication key " << package.GetAuthenticationKey();
+	const std::string& auth_key = package.GetAuthenticationKey();
+	std::string username = auth_key.substr(0, auth_key.find('#'));
+	std::string password = auth_key.substr(auth_key.find('#') + 1,
+			auth_key.length());
 
+	ELoginResult result = higan::Singleton<UserManager>::Instance().Login(username, password);
+
+	uint32_t user_id = random() % UINT32_MAX;
+
+	LOG_INFO << connection_ptr->GetConnectionName() << " username: " << username <<
+			 " ,password: " << password << " ,user_id: " << std::to_string(user_id) <<
+			 " ,result: " << std::to_string(result);
+
+	LoginResultPackage login_result_package(result, user_id);
+
+	uint8_t send_buffer[512];
+	login_result_package.SerializeToBuffer(send_buffer, sizeof send_buffer);
+	uint32_t msg_len = login_result_package.GetPackageLen();
+
+	for (size_t i = 0; i < msg_len; ++i)
+	{
+		printf("%02X ", send_buffer[i]);
+	}
+	printf("\n");
+
+	connection_ptr->Send((const char*)send_buffer, msg_len);
 }
 
 int main()

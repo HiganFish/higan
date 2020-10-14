@@ -110,6 +110,10 @@ protected:
 	*/
 	ssize_t DeSerializeHeaderFromBuffer(const uint8_t* data, size_t data_len, size_t* body_len);
 
+public:
+
+	uint32_t GetPackageLen() const;
+
 protected:
 	const static size_t BUFFER_LEN = 4096;
 
@@ -128,7 +132,7 @@ protected:
 private:
 
 	// 包序列化后的总字节数
-	// uint32_t PackageSize_;
+	uint32_t package_len_;
 
 	uint32_t player_id_;
 
@@ -139,6 +143,6 @@ private:
 	uint32_t no_;
 
 	// 校验和 使用BCC算法 自身四字节不算入包长度 不参与校验  序列化时应放在Header后
-	// uint32_t CheckSum_;
+	uint32_t check_sum_;
 
 };
